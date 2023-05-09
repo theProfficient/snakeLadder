@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const tournamentSchema = new mongoose.Schema(
+const snkTournamentSchema = new mongoose.Schema(
   {
     UserId: {
       type: String,
@@ -41,12 +41,8 @@ const tournamentSchema = new mongoose.Schema(
     endTime: {
       type: Date,
     },
-    isMatchOverForTable: {
-      type: Boolean,
-      default: false,
-    },
   },
 
   { timestamps: true }
 );
-module.exports = mongoose.model("tournament", tournamentSchema);
+module.exports = mongoose.model("snkTournament", snkTournamentSchema);

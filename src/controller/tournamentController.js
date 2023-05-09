@@ -411,6 +411,7 @@ const getAllTables = async function (req, res) {
       for (let id = 0; id < tableId.length; id++) {
         let status = await groupModel.findOne({ tableId: tableId[id] });
         if (status) {
+          //check match is running or finshed.
           if(status.isMatchOver === false){
           matchStatus.push({
             tableId: status.tableId,
@@ -527,6 +528,7 @@ const updateTournament = async function (req, res) {
     let userData = await tournamentModel.aggregate([
       {
         $match: {
+          isMatchOverForTable:false,
           Users: {
             $elemMatch: {
               UserId: UserId,
@@ -594,7 +596,9 @@ const updateTournament = async function (req, res) {
     return res.status(200).send({
       status: true,
       message: "Success",
-      data: tableUpdate,
+      data: {
+        tableUpdate,
+        balance:userHistory.credits}
     });
   } catch (err) {
     return res.status(500).send({

@@ -26,6 +26,19 @@ Router.get("/getAllCricketData", cricketController.getAllCric);
 Router.get("/getCricGrp", cricketController.getCricByGroupId);
 
 Router.get("/winner", cricketController.winTheGame);
+//______Cricket tournaments_________
+
+Router.post("/tournaments", tournamentController.createTournaments);
+
+Router.get("/tables", tournamentController.getAllTables);
+
+Router.put("/tournament", tournamentController.updateTournament);
+
+Router.get("/groups", tournamentController.getGroups);
+
+Router.get("/players", tournamentController.getPlayers);
+
+
 
 //__________________Hocky___________________
 
@@ -33,11 +46,13 @@ Router.put("/updateHocky", hockyController.updateHoc);
 
 Router.get("/getAllHockyData", hockyController.getAllHoc);
 
-//__________________snakeLadder___________________
+//__________________snakeLadder Tournaments___________________
 
-Router.put("/updateSnakeLadder", snakeLadderController.updateSnak);
+Router.post("/snktournaments", snakeLadderController.createSnakeLadderTables);
 
 Router.get("/getAllSnakeLadderData", snakeLadderController.getAllSnak);
+
+Router.put("/updateSnakeLadder", snakeLadderController.updateSnakLdrTournaments);
 
 //__________________ticTacToe___________________
 
@@ -49,17 +64,7 @@ Router.get("/getAllTicTacToeData", ticTacToeController.getAllTic);
 
 Router.put("/updateBalance", balanceController.updatecredits);
 
-//___________tournaments_________
 
-Router.post("/tournaments", tournamentController.createTournaments);
-
-Router.get("/tables", tournamentController.getAllTables);
-
-Router.put("/tournament", tournamentController.updateTournament);
-
-Router.get("/groups", tournamentController.getGroups);
-
-Router.get("/players", tournamentController.getPlayers);
 
 //************ checking your end point valid or not */
 

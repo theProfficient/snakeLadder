@@ -56,15 +56,46 @@ const getCricByGroupId = async function (req, res) {
        });
      }
      let ballCount = cricket.ball
-     if(ballCount === 0){
-    let players = cricket.updatedPlayers.sort((a,b) => {
-      if(b.run !== a.run){
-        return b.run - a.run; //__sort by runs in descending order
-      }else{
-        return a.wicket - b.wicket; //___sort by wickets in ascending order for players with the same runs
+     if(ballCount === 0 && isWicketUpdated === false){
+      // let  updatedPlayers = cricket.updatedPlayers.map((players)=> {
+      //   if (!players.hit && players.isBot === false) {
+      //     //___________If the player did not hit the ball, set the wicket to true
+      //     players.wicket += 1;
+      //     players.isWicketUpdated = true
+      //   }
+      //   return players;
+      // });
+
+      // await groupModel.updateOne({ _id: groupId }, { $set: { updatedPlayers } });
+   
+
+    // let players = cricket.updatedPlayers.sort((a,b) => {
+    //   if(b.run !== a.run){
+    //     return b.run - a.run; //__sort by runs in descending order
+    //   }else{
+    //     return a.wicket - b.wicket; //___sort by wickets in ascending order for players with the same runs
+    //   }
+    //  })
+    //  console.log(players,"declareWinners_______________");
+
+    //merging code of sort and map function
+
+    let players = cricket.updatedPlayers.map((player) => {
+      if (!player.hit && player.isBot === false && isWicketUpdated === false) {
+        player.wicket += 1; // If the player did not hit the ball, set the wicket to true
+        player.isWicketUpdated = true;
       }
-     })
-     console.log(players,"declareWinners_______________");
+      return player;
+    }).sort((a, b) => {
+      if (b.run !== a.run) {
+        return b.run - a.run; // Sort by runs in descending order
+      } else {
+        return a.wicket - b.wicket; // Sort by wickets in ascending order for players with the same runs
+      }
+    });
+    
+    console.log(players, "declareWinners_______________");
+    
 
     //_________________winner prize as per prize amount
       
@@ -76,27 +107,29 @@ const getCricByGroupId = async function (req, res) {
 
     const result = await groupModel.findByIdAndUpdate(
       {_id:groupId},
-      {$set:{updatedPlayers:players}},
+      {$set:{updatedPlayers:players},
+      isWicketUpdated :true},
       {new:true}
     )
     let users = result.updatedPlayers;
+    let tableId = result.tableId ;
     //  let prizes = result.updatedPlayers;
     
     // Create an array of update operations to update the balance of each user
-    let updates = users.map((player) => {
-      let prize =  player.prize;
-      return {
-        updateOne: {
-          filter: { UserId: player.UserId },
-          update: { $inc: { realMoney: prize } },
-          new: true
-        }
-      };
-    });
+    let userBulkUpdates = users.map((player) => ({
+      updateOne: {
+        filter: { UserId: player.UserId },
+        update: { $inc: { realMoney: player.prize } },
+        new: true
+      }
+    }));
     
     // Execute the update operations in a single database call by bulkWrite() method
-   const updatedBalance = await userModel.bulkWrite(updates);
+    const updatedBalance = await userModel.bulkWrite(userBulkUpdates);
     
+    //________________________update table
+
+     let updateTable = await tournamentModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
     let resForWinners = {
       _id: result._id,
       createdTime: result.createdTime,

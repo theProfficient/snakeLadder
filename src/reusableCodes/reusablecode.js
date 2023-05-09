@@ -6,6 +6,8 @@ const _ = require("lodash");
 const fakeUsers = require("../controller/dummyUsers");
 const { find } = require("lodash");
 const groupModel = require("../model/groupModel");
+const snkTournamentModel = require("../model/snkTournamentModel");
+const groupModelForSnakeLadder = require("../model/groupModelForSnakeLadder");
 
 const createGroup = async function (tableId) {
   if (tableId != undefined) {
@@ -99,7 +101,7 @@ async function updateBalls(grpId) {
     let updateWicket = await groupModel.findByIdAndUpdate({ _id: grpId });
     let ballCountForWicket = updateWicket.ball;
 
-    if (ballCountForWicket < 6) {
+    if (ballCountForWicket < 6 && ballCountForWicket > 0) {
       let updatedPlayers = updateWicket.updatedPlayers.map((player) => {
         if (!player.hit && player.isBot === false) {
           //___________If the player did not hit the ball, set the wicket to true
@@ -133,7 +135,6 @@ async function updateBalls(grpId) {
 
       let ballCount = updateBall.ball;
 
-      
       console.log(ballCount, "ballCount================");
       console.log(updateBall.nextBallTime, "nextBallTime================");
 
@@ -197,5 +198,138 @@ function runUpdateBalls(grpId) {
     updateBallsRecursive();
   }
 }
+//____________________________________for snakeLadder_____________________
 
-module.exports = { startMatch, runUpdateBalls, createGroup };
+const createGroupForSnakeLadder = async function (tableId) {
+  if (tableId != undefined) {
+    let table = await snkTournamentModel.findOne({ _id: tableId });
+
+    if (table != undefined || table != null) {
+      let players = table.players;
+      let users = table.Users;
+
+      if (users.length !== 0) {
+        users = users.map((user) => {
+          return {
+            UserId: user.UserId,
+            userName: user.userName,
+            isBot: user.isBot,
+          };
+        });
+        //________________________________import dummyusers and add as per need to complete groups
+
+        let dummyUsers = fakeUsers.fakeUsers;
+        dummyUsers = dummyUsers.map((user) => {
+          return {
+            UserId: user.UserId,
+            userName: user.userName,
+            isBot: user.isBot,
+          };
+        });
+        const groups = _.chunk(players, 2);
+
+        let completePlayers = [
+          ...users,
+          ...dummyUsers.slice(0, 2 - (users.length % 2)),
+        ];
+
+        let completeGroups = _.chunk(completePlayers, 2);
+
+        for (let i = 0; i < completeGroups.length; i++) {
+          let createGrp = await groupModelForSnakeLadder.create({
+            group: completeGroups[i],
+            tableId: tableId,
+          });
+          let grpId = createGrp._id;
+          let group = createGrp.group;
+          console.log(createGrp);
+          // setTimeout(function () {
+          startMatchForSnkLdr(grpId, group);
+          // }, 120000);
+
+          // runUpdateBalls(grpId);
+        }
+      }
+    }
+  }
+};
+
+async function startMatchForSnkLdr(grpId, group) {
+  console.log("grpid>>>>>>>>>>>", grpId);
+  console.log("groups>>>>>>>>>>>>>>>>>", group);
+  if (grpId !== undefined) {
+    const result = group.map((name) => ({
+      UserId: name.UserId,
+      userName: name.userName,
+      isBot: name.isBot,
+      points: 0,
+    }));
+    console.log("result", result);
+    const matchData = await groupModelForSnakeLadder.findOneAndUpdate(
+      { _id: grpId },
+      { updatedPlayers: result, $set: { start: true } },
+      { new: true, setDefaultsOnInsert: true }
+    );
+    console.log("this is updated data >>>>>>>>>>", matchData);
+    // setTimeout(function () {
+    let updatedPlayers = matchData.updatedPlayers;
+    //       // randomly select the first player
+    // let player1 = players[0].UserId ;
+    // let player2 = players[1]. UserId;
+    //   const currentPlayer = Math.random() < 0.5 ? player1 : player2;
+    updatePoints(grpId, updatedPlayers);
+    // }, 7000);
+  }
+}
+
+async function updatePoints(grpId, updatedPlayers) {
+  let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
+  let playerToUpdate = updatedPlayers[currentPlayerIndex];
+  let fstPlayerId = playerToUpdate.UserId;
+
+  // find the other player in the array
+  let otherPlayer = updatedPlayers.filter(
+    (player) => player !== playerToUpdate
+  )[0];
+  let secondPlayerId = playerToUpdate.UserId;
+  let player1Turn = true;
+  // let points = 0
+  if (player1Turn) {
+    // Player 1's turn
+    const possibleValues = [1, 2, 3, 4, 6];
+
+    const randomIndex = Math.floor(Math.random() * possibleValues.length);
+
+    const randomValue = possibleValues[randomIndex];
+    playerToUpdate.points += randomValue;
+    let updatedPointsFstPlayer = await groupModel.findOneAndUpdate(
+      { _id: grpId, updatedPlayers: { $elemMatch: { UserId: fstPlayerId } } },
+      { $set: { "updatedPlayers.$": playerToUpdate } },
+      { new: true }
+    );
+    player1Turn = false; // switch turns
+  } else {
+    // Player 2's turn
+    const possibleValues = [1, 2, 3, 4, 6];
+
+    const randomIndex = Math.floor(Math.random() * possibleValues.length);
+
+    const randomValue = possibleValues[randomIndex];
+    otherPlayer.points += randomIndex;
+    let updatedPointsOfAnotherPlayer = await groupModel.findOneAndUpdate(
+      {
+        _id: grpId,
+        updatedPlayers: { $elemMatch: { UserId: secondPlayerId } },
+      },
+      { $set: { "updatedPlayers.$": otherPlayer } },
+      { new: true }
+    );
+    player1Turn = true; // switch turns
+  }
+}
+module.exports = {
+  startMatch,
+  runUpdateBalls,
+  createGroup,
+  createGroupForSnakeLadder,
+};
