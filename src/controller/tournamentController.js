@@ -390,6 +390,7 @@ const getAllTables = async function (req, res) {
     let userData = await tournamentModel.aggregate([
       {
         $match: {
+          isMatchOverForTable:false,
           Users: {
             $elemMatch: {
               UserId: UserId,

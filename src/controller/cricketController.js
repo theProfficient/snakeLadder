@@ -69,32 +69,32 @@ const getCricByGroupId = async function (req, res) {
       // await groupModel.updateOne({ _id: groupId }, { $set: { updatedPlayers } });
    
 
-    // let players = cricket.updatedPlayers.sort((a,b) => {
-    //   if(b.run !== a.run){
-    //     return b.run - a.run; //__sort by runs in descending order
-    //   }else{
-    //     return a.wicket - b.wicket; //___sort by wickets in ascending order for players with the same runs
-    //   }
-    //  })
-    //  console.log(players,"declareWinners_______________");
+    let players = cricket.updatedPlayers.sort((a,b) => {
+      if(b.run !== a.run){
+        return b.run - a.run; //__sort by runs in descending order
+      }else{
+        return a.wicket - b.wicket; //___sort by wickets in ascending order for players with the same runs
+      }
+     })
+     console.log(players,"declareWinners_______________");
 
     //merging code of sort and map function
 
-    let players = cricket.updatedPlayers.map((player) => {
-      if (!player.hit && player.isBot === false && isWicketUpdated === false) {
-        player.wicket += 1; // If the player did not hit the ball, set the wicket to true
-        player.isWicketUpdated = true;
-      }
-      return player;
-    }).sort((a, b) => {
-      if (b.run !== a.run) {
-        return b.run - a.run; // Sort by runs in descending order
-      } else {
-        return a.wicket - b.wicket; // Sort by wickets in ascending order for players with the same runs
-      }
-    });
+    // let players = cricket.updatedPlayers.map((player) => {
+    //   if (!player.hit && player.isBot === false && isWicketUpdated === false) {
+    //     player.wicket += 1; // If the player did not hit the ball, set the wicket to true
+    //     player.isWicketUpdated = true;
+    //   }
+    //   return player;
+    // }).sort((a, b) => {
+    //   if (b.run !== a.run) {
+    //     return b.run - a.run; // Sort by runs in descending order
+    //   } else {
+    //     return a.wicket - b.wicket; // Sort by wickets in ascending order for players with the same runs
+    //   }
+    // });
     
-    console.log(players, "declareWinners_______________");
+    // console.log(players, "declareWinners_______________");
     
 
     //_________________winner prize as per prize amount
@@ -129,7 +129,7 @@ const getCricByGroupId = async function (req, res) {
     
     //________________________update table
 
-     let updateTable = await tournamentModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
+    //  let updateTable = await tournamentModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
     let resForWinners = {
       _id: result._id,
       createdTime: result.createdTime,

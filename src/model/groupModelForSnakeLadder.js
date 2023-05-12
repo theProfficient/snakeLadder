@@ -28,6 +28,10 @@ const SnakeLadderGroupSchema = new mongoose.Schema(
             type: Number,
             default:0,
           },
+          turn:{
+            type:Boolean,
+            default:false
+          }
       },
     ],
     start: {

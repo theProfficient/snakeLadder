@@ -1,4 +1,3 @@
-const cron = require("node-cron");
 const mongoose = require("mongoose");
 const userModel = require("../model/userModel");
 const snkTournamentModel = require("../model/snkTournamentModel");
@@ -255,6 +254,12 @@ const updateSnakLdrTournaments = async function (req, res) {
       });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(tableId)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "invalid tableId" });
+    }
+
     let existTable = await snkTournamentModel.findById({ _id: tableId });
     if (!existTable) {
       return res.status(404).send({
@@ -375,8 +380,151 @@ const updateSnakLdrTournaments = async function (req, res) {
   }
 };
 
+const getCricByGroupId = async function (req, res) {
+  try {
+    let groupId = req.query.groupId;
+
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "invalid groupId" });
+    }
+    let snakeLadder = await groupModelForSnakeLadder
+      .findById({ _id: groupId })
+      .lean();
+    if (!snakeLadder) {
+      return res
+        .status(404)
+        .send({ status: false, message: "this groupId not found" });
+    }
+
+    let tableId = snakeLadder.tableId;
+
+    const checkTable = await snkTournamentModel
+      .findById({ _id: tableId })
+      .lean();
+    if (!checkTable) {
+      return res.status(404).send({
+        status: false,
+        message: "this table is not present in DB",
+      });
+    }
+
+    //________________________update table
+
+    //  let updateTable = await snakeLadderModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
+    let result = {
+      _id: snakeLadder._id,
+      createdTime: snakeLadder.createdTime,
+      tableId: snakeLadder.tableId,
+      updatedPlayers: snakeLadder.updatedPlayers,
+      start: snakeLadder.start,
+      currentBallTime: new Date(),
+    };
+
+    return res.status(200).json(result);
+  } catch (err) {
+    return res.status(500).send({
+      status: false,
+      error: err.message,
+    });
+  }
+};
+
+const updatePointOfUser = async function (req, res) {
+  try {
+    let UserId = req.query.UserId;
+    let groupId = req.query.groupId;
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "invalid groupId" });
+    }
+    let grpIdIsExixt = await groupModelForSnakeLadder.findById({
+      _id: groupId,
+    });
+    if (!grpIdIsExixt) {
+      return res
+        .status(404)
+        .send({ status: false, message: "groupId is not present" });
+    }
+    let updatedPlayers = grpIdIsExixt.updatedPlayers.find(
+      (players) => players.UserId === UserId
+    );
+    if (!updatedPlayers) {
+      return res
+        .status(404)
+        .send({
+          status: false,
+          message: "this user is not present in this group",
+        });
+    }
+    let turn = updatedPlayers.turn;
+    if (turn === false) {
+      return res.status(400).send({ status: false, message: "not your turn" });
+    }
+
+    const possibleValues = [1, 2, 3, 4, 5, 6];
+
+    const randomIndex = Math.floor(Math.random() * possibleValues.length);
+
+    const randomValue = possibleValues[randomIndex];
+    updatedPlayers.points += randomValue;
+    updatedPlayers.turn = false;
+    let updatedPointsFstPlayer =
+      await groupModelForSnakeLadder.findOneAndUpdate(
+        { _id: groupId, updatedPlayers: { $elemMatch: { UserId: UserId } } },
+        { $set: { "updatedPlayers.$": updatedPlayers } },
+        { new: true }
+      );
+    let updatedTurn = updatedPointsFstPlayer.updatedPlayers.find(
+      (players) => players.UserId === UserId
+    );
+    let anotherUser = grpIdIsExixt.updatedPlayers.find(
+      (players) => players.UserId !== UserId
+    );
+
+    if (updatedTurn.turn === false) {
+      let userIdOfSecUser = anotherUser.UserId;
+      anotherUser.turn = true;
+
+      setTimeout(async function () {
+        let updatedPointSecPlayer =
+          await groupModelForSnakeLadder.findOneAndUpdate(
+            {
+              _id: groupId,
+              updatedPlayers: { $elemMatch: { UserId: userIdOfSecUser } },
+            },
+            { $set: { "updatedPlayers.$": anotherUser } },
+            { new: true }
+          );
+      }, randomValue * 1000);
+    }
+    if (updatedTurn.turn === false) {
+      setTimeout(async function () {
+        let updatedPointSecPlayer =
+          await groupModelForSnakeLadder.findOneAndUpdate(
+            {
+              _id: groupId,
+              updatedPlayers: { $elemMatch: { UserId: userIdOfSecUser } },
+            },
+            { $set: { "updatedPlayers.$": anotherUser } },
+            { new: true }
+          );
+      }, 8000);
+    }
+    return res.status(200).json(updatedPointsFstPlayer);
+  } catch (err) {
+    return res.status(500).send({
+      status: false,
+      error: err.message,
+    });
+  }
+};
 module.exports = {
   updateSnakLdrTournaments,
   getAllSnak,
   createSnakeLadderTables,
+  getCricByGroupId,
+  updatePointOfUser,
 };

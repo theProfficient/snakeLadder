@@ -100,15 +100,15 @@ async function updateBalls(grpId) {
   if (grpId != undefined) {
     let updateWicket = await groupModel.findByIdAndUpdate({ _id: grpId });
     let ballCountForWicket = updateWicket.ball;
-
-    if (ballCountForWicket < 6 && ballCountForWicket > 0) {
+    let tableId = updateWicket.tableId;
+    if (ballCountForWicket < 6 ) {
       let updatedPlayers = updateWicket.updatedPlayers.map((player) => {
         if (!player.hit && player.isBot === false) {
           //___________If the player did not hit the ball, set the wicket to true
           player.wicket += 1;
           player.isRunUpdated = false;
         }
-        if (player.hit) {
+        if (player.hit && ballCountForWicket > 1) {
           //______________If the player did not hit the ball, set the wicket to true
           player.hit = false;
           player.isRunUpdated = false;
@@ -118,7 +118,7 @@ async function updateBalls(grpId) {
 
       await groupModel.updateOne({ _id: grpId }, { $set: { updatedPlayers } });
     }
-
+    let ballCount ;
     if (ballCountForWicket > 0) {
       let updateBall = await groupModel.findByIdAndUpdate(
         { _id: grpId },
@@ -133,7 +133,7 @@ async function updateBalls(grpId) {
         { new: true }
       );
 
-      let ballCount = updateBall.ball;
+       ballCount = updateBall.ball;
 
       console.log(ballCount, "ballCount================");
       console.log(updateBall.nextBallTime, "nextBallTime================");
@@ -164,7 +164,8 @@ async function updateBalls(grpId) {
         { $set: { updatedPlayers: updateRunForBot } }
       );
     }
-    if (ballCountForWicket <= min) {
+
+    if(ballCount === 0){
       let endTheMatch = await groupModel.findByIdAndUpdate(
         { _id: grpId },
         {
@@ -172,6 +173,10 @@ async function updateBalls(grpId) {
         },
         { new: true }
       );
+      let updateTable = await tournamentModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
+    }
+    if (ballCountForWicket <= min-1) {
+      
       console.log("Reached minimum ball count!");
       return true;
     }
@@ -263,6 +268,7 @@ async function startMatchForSnkLdr(grpId, group) {
       userName: name.userName,
       isBot: name.isBot,
       points: 0,
+      turn:name.turn
     }));
     console.log("result", result);
     const matchData = await groupModelForSnakeLadder.findOneAndUpdate(
@@ -277,56 +283,74 @@ async function startMatchForSnkLdr(grpId, group) {
     // let player1 = players[0].UserId ;
     // let player2 = players[1]. UserId;
     //   const currentPlayer = Math.random() < 0.5 ? player1 : player2;
-    updatePoints(grpId, updatedPlayers);
+   // updatePoints(grpId, updatedPlayers);
     // }, 7000);
+    let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
+    matchData.updatedPlayers[currentPlayerIndex].turn = true;
+    const updatedGroupFst = await groupExist.save();
+
   }
 }
 
-async function updatePoints(grpId, updatedPlayers) {
-  let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
-  let playerToUpdate = updatedPlayers[currentPlayerIndex];
-  let fstPlayerId = playerToUpdate.UserId;
+// async function updatePoints(grpId, updatedPlayers) {
+//   let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
+//   let playerToUpdate = updatedPlayers[currentPlayerIndex];
+//   let fstPlayerId = playerToUpdate.UserId;
 
-  // find the other player in the array
-  let otherPlayer = updatedPlayers.filter(
-    (player) => player !== playerToUpdate
-  )[0];
-  let secondPlayerId = playerToUpdate.UserId;
-  let player1Turn = true;
-  // let points = 0
-  if (player1Turn) {
-    // Player 1's turn
-    const possibleValues = [1, 2, 3, 4, 6];
+//   // find the other player in the array
+//   let otherPlayer = updatedPlayers.filter(
+//     (player) => player !== playerToUpdate
+//   )[0];
+//   let secondPlayerId = playerToUpdate.UserId;
+//   let player1Turn = true;
+//   // let points = 0
+//   if (player1Turn) {
+//     // Player 1's turn
+    // const possibleValues = [1, 2, 3, 4,5 ,6];
 
-    const randomIndex = Math.floor(Math.random() * possibleValues.length);
+    // const randomIndex = Math.floor(Math.random() * possibleValues.length);
 
-    const randomValue = possibleValues[randomIndex];
-    playerToUpdate.points += randomValue;
-    let updatedPointsFstPlayer = await groupModel.findOneAndUpdate(
-      { _id: grpId, updatedPlayers: { $elemMatch: { UserId: fstPlayerId } } },
-      { $set: { "updatedPlayers.$": playerToUpdate } },
-      { new: true }
-    );
-    player1Turn = false; // switch turns
-  } else {
-    // Player 2's turn
-    const possibleValues = [1, 2, 3, 4, 6];
+    // const randomValue = possibleValues[randomIndex];
+    // playerToUpdate.points += randomValue;
+    // let updatedPointsFstPlayer = await groupModel.findOneAndUpdate(
+    //   { _id: grpId, updatedPlayers: { $elemMatch: { UserId: fstPlayerId } } },
+    //   { $set: { "updatedPlayers.$": playerToUpdate } },
+    //   { new: true }
+    // );
+//     player1Turn = false; // switch turns
+//   } else {
+//     // Player 2's turn
+//     const possibleValues = [1, 2, 3, 4, 6];
 
-    const randomIndex = Math.floor(Math.random() * possibleValues.length);
+//     const randomIndex = Math.floor(Math.random() * possibleValues.length);
 
-    const randomValue = possibleValues[randomIndex];
-    otherPlayer.points += randomIndex;
-    let updatedPointsOfAnotherPlayer = await groupModel.findOneAndUpdate(
-      {
-        _id: grpId,
-        updatedPlayers: { $elemMatch: { UserId: secondPlayerId } },
-      },
-      { $set: { "updatedPlayers.$": otherPlayer } },
-      { new: true }
-    );
-    player1Turn = true; // switch turns
-  }
-}
+//     const randomValue = possibleValues[randomIndex];
+//     otherPlayer.points += randomIndex;
+//     let updatedPointsOfAnotherPlayer = await groupModel.findOneAndUpdate(
+//       {
+//         _id: grpId,
+//         updatedPlayers: { $elemMatch: { UserId: secondPlayerId } },
+//       },
+//       { $set: { "updatedPlayers.$": otherPlayer } },
+//       { new: true }
+//     );
+//     player1Turn = true; // switch turns
+//   }
+// }
+
+// async function updatePoints(grpId, updatedPlayers) {
+//   let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
+//   let playerToUpdate = updatedPlayers[currentPlayerIndex];
+//   let fstPlayerId = playerToUpdate.UserId;
+   
+//   // find the other player in the array
+//   // let otherPlayer = updatedPlayers.find(
+//   //   (player) => player !== playerToUpdate
+//   // );
+//   // let secondPlayerId = playerToUpdate.UserId;
+  
+// }
+
 module.exports = {
   startMatch,
   runUpdateBalls,
