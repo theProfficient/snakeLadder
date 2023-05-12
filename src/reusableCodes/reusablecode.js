@@ -176,7 +176,7 @@ async function updateBalls(grpId) {
       let updateTable = await tournamentModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
     }
     if (ballCountForWicket <= min-1) {
-      
+
       console.log("Reached minimum ball count!");
       return true;
     }
@@ -287,7 +287,7 @@ async function startMatchForSnkLdr(grpId, group) {
     // }, 7000);
     let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
     matchData.updatedPlayers[currentPlayerIndex].turn = true;
-    const updatedGroupFst = await groupExist.save();
+    const updatedGroupFst = await matchData.save();
 
   }
 }

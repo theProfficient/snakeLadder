@@ -435,6 +435,11 @@ const updatePointOfUser = async function (req, res) {
   try {
     let UserId = req.query.UserId;
     let groupId = req.query.groupId;
+    if (!UserId && !groupId) {
+      return res
+        .status(400)
+        .send({ status: false, message: "please provide both groupId and UserId" });
+    }
     if (!mongoose.Types.ObjectId.isValid(groupId)) {
       return res
         .status(400)
@@ -500,20 +505,31 @@ const updatePointOfUser = async function (req, res) {
           );
       }, randomValue * 1000);
     }
-    if (updatedTurn.turn === false) {
-      setTimeout(async function () {
-        let updatedPointSecPlayer =
-          await groupModelForSnakeLadder.findOneAndUpdate(
-            {
-              _id: groupId,
-              updatedPlayers: { $elemMatch: { UserId: userIdOfSecUser } },
-            },
-            { $set: { "updatedPlayers.$": anotherUser } },
-            { new: true }
-          );
-      }, 8000);
+    // if (updatedTurn.turn === false) {
+    //   setTimeout(async function () {
+    //     let updatedPointSecPlayer =
+    //       await groupModelForSnakeLadder.findOneAndUpdate(
+    //         {
+    //           _id: groupId,
+    //           updatedPlayers: { $elemMatch: { UserId: userIdOfSecUser } },
+    //         },
+    //         { $set: { "updatedPlayers.$": anotherUser } },
+    //         { new: true }
+    //       );
+    //   }, 8000);
+
+    let result ={
+    currentPoints: randomValue,
+    nextTurn: anotherUser.UserId,
+    UserId: updatedTurn.UserId,
+    userName: updatedTurn.userName,
+    prize: updatedTurn.prize,
+    isBot: updatedTurn.isBot,
+    totalPoints: updatedTurn.points,
+    turn: updatedTurn.turn
     }
-    return res.status(200).json(updatedPointsFstPlayer);
+    // }
+    return res.status(200).json(result);
   } catch (err) {
     return res.status(500).send({
       status: false,
