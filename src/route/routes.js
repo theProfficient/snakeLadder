@@ -58,6 +58,8 @@ Router.get("/getGroup", snakeLadderController.getSnkByGroupId);
 
 Router.put("/updateSnakeLadderPerPlayer", snakeLadderController.updatePointOfUser);
 
+Router.get("/playersOfSnkLdr", snakeLadderController.getPlayersOfSnkLadder);
+
 //__________________ticTacToe___________________
 
 Router.put("/updateTicTacToe", ticTacToeController.updateTic);
