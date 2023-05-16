@@ -38,6 +38,14 @@ const SnakeLadderGroupSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    lastHitTime:{
+      type:Date,
+      default:new Date()
+    },
+    currentUserId:{
+      type:String,
+      default:''
+    },
     isGameOver: {
       type: Boolean,
       default: false,

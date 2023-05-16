@@ -50,11 +50,11 @@ Router.get("/getAllHockyData", hockyController.getAllHoc);
 
 Router.post("/snktournaments", snakeLadderController.createSnakeLadderTables);
 
-Router.get("/getAllSnakeLadderData", snakeLadderController.getAllSnak);
+Router.get("/tables", snakeLadderController.getAllSnak);
 
-Router.put("/updateSnakeLadder", snakeLadderController.updateSnakLdrTournaments);
+Router.put("/tournament", snakeLadderController.updateSnakLdrTournaments);
 
-Router.get("/getGroup", snakeLadderController.getCricByGroupId);
+Router.get("/groups", snakeLadderController.getSnkByGroupId);
 
 Router.put("/updateSnakeLadderPerPlayer", snakeLadderController.updatePointOfUser);
 

@@ -41,6 +41,10 @@ const snkTournamentSchema = new mongoose.Schema(
     endTime: {
       type: Date,
     },
+    isGameOverForTable: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   { timestamps: true }
