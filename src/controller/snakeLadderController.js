@@ -371,9 +371,83 @@ const updateSnakLdrTournaments = async function (req, res) {
     return res.status(200).send({
       status: true,
       message: "Success",
-      data:  {
+      data: {
         tableUpdate,
-        balance:userHistory.credits},
+        balance: userHistory.credits,
+      },
+    });
+  } catch (err) {
+    return res.status(500).send({
+      status: false,
+      error: err.message,
+    });
+  }
+};
+
+//__________________________________get groups per players and tableId ____________________________________________
+const getGroupsByUser = async function (req, res) {
+  try {
+    let tableId = req.query.tableId;
+    let UserId = req.query.UserId;
+
+    if (Object.keys(req.query).length <= 1) {
+      return res.status(400).send({
+        status: false,
+        message: " Please provide both tableId and UserId ",
+      });
+    }
+    let userExist = await userModel.findOne({ UserId: UserId });
+
+    if (userExist == null) {
+      return res.status(404).send({
+        status: false,
+        message: " User not found ",
+      });
+    }
+    let userName = userExist.userName;
+
+    const table = await groupModelForSnakeLadder.find({ tableId: tableId });
+    console.log(table);
+
+    if (table.length === 0) {
+      return res.status(404).send({
+        status: false,
+        message: " This table is not present ",
+      });
+    }
+    let groups = table.map((items) => items.group);
+    console.log(groups, "groups>>>>>>>>>>>");
+
+    let user, groupId, users;
+    for (let group = 0; group < groups.length; group++) {
+      console.log(groups[group], "================================");
+
+      let findUser = groups[group].find((user) => user.userName === userName);
+
+      if (findUser != null) {
+        user = findUser;
+        groupId = table[group]._id;
+        users = groups[group];
+        break;
+      }
+    }
+
+    if (!user) {
+      return res.status(404).send({
+        status: true,
+        message: "this user is not present in any group",
+      });
+    }
+
+    console.log(user, ">>>>>>>>>>>>>");
+    users = users.map((items) => items.userName);
+    let usersNameInStr = users.join(" ");
+
+    return res.status(200).send({
+      status: true,
+      message: "Success",
+      groupId,
+      usersNameInStr,
     });
   } catch (err) {
     return res.status(500).send({
@@ -798,6 +872,7 @@ module.exports = {
   updateSnakLdrTournaments,
   getAllSnak,
   createSnakeLadderTables,
+  getGroupsByUser,
   getSnkByGroupId,
   updatePointOfUser,
   getPlayersOfSnkLadder,
