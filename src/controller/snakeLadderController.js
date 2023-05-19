@@ -216,7 +216,7 @@ const getAllSnak = async function (req, res) {
         return res.status(200).send({
           status: true,
           message: "Success",
-          gameStatus: gameStatus,
+          matchStatus: gameStatus,
           endTime: endTime,
           joined: true,
           currentTime: currentTime,
@@ -371,7 +371,9 @@ const updateSnakLdrTournaments = async function (req, res) {
     return res.status(200).send({
       status: true,
       message: "Success",
-      data: tableUpdate,
+      data:  {
+        tableUpdate,
+        balance:userHistory.credits},
     });
   } catch (err) {
     return res.status(500).send({
