@@ -708,7 +708,7 @@ const getSnkByGroupId = async function (req, res) {
       let result = {
         _id: updateTurn._id,
         createdTime: updateTurn.createdTime,
-        currentPoints: 1,
+        currentPoints: 0,
         nextTurn: updateTurn.updatedPlayers[nextUserIndex].UserId,
         currentTime: new Date(),
         nextTurnTime: updateTurn.nextTurnTime,
@@ -726,7 +726,7 @@ const getSnkByGroupId = async function (req, res) {
     let result = {
       _id: snakeLadder._id,
       createdTime: snakeLadder.createdTime,
-      currentPoints: 1,
+      currentPoints: 0,
       nextTurn: nxtPlayer.UserId,
       currentTime: new Date(),
       nextTurnTime: snakeLadder.nextTurnTime,
