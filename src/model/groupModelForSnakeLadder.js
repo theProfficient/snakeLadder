@@ -46,6 +46,10 @@ const SnakeLadderGroupSchema = new mongoose.Schema(
       type:String,
       default:''
     },
+    nextTurnTime:{
+      type:Date,
+      default:new Date()
+    },
     isGameOver: {
       type: Boolean,
       default: false,

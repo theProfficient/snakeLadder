@@ -54,7 +54,7 @@ Router.get("/getAllSnakeLadderData", snakeLadderController.getAllSnak);
 
 Router.put("/updateSnakeLadder", snakeLadderController.updateSnakLdrTournaments);
 
-Router.get("/getGroupByUserId", snakeLadderController.getGroupsByUser);
+Router.get("/getGroupsByUserId", snakeLadderController.getGroupsByUser);
 
 Router.get("/getGroup", snakeLadderController.getSnkByGroupId);
 
