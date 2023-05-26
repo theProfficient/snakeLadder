@@ -500,7 +500,7 @@ const getSnkByGroupId = async function (req, res) {
       (players) => players.points === 100
     );
 
-    if (timeDiff >= 3 || reachTheDestination) {
+    if (timeDiff >= 4 || reachTheDestination) {
       // checkTable.isGameOverForTable = true;
       // await snkTournamentModel.save();
       let overTheGame = await snkTournamentModel.updateOne(
@@ -525,13 +525,14 @@ const getSnkByGroupId = async function (req, res) {
           _id: snakeLadder._id,
           createdTime: snakeLadder.createdTime,
           currentPoints: 0,
-          nextTurn: "game is over",
+          currentTurn: "game is over",
           currentTime: new Date(),
           nextTurnTime: new Date(),
           tableId: snakeLadder.tableId,
           updatedPlayers: overGame.updatedPlayers,
           start: overGame.start,
           isGameOver: overGame.isGameOver,
+          gameEndTime:overGame.gameEndTime
         };
         return res.status(200).json(result);
       }
@@ -592,13 +593,14 @@ const getSnkByGroupId = async function (req, res) {
         _id: snakeLadder._id,
         createdTime: snakeLadder.createdTime,
         currentPoints: 0,
-        nextTurn: "game is over",
+        currentTurn: "game is over",
         currentTime: new Date(),
         nextTurnTime: new Date(),
         tableId: snakeLadder.tableId,
         updatedPlayers: overGame.updatedPlayers,
         start: overGame.start,
         isGameOver: overGame.isGameOver,
+        gameEndTime:overGame.gameEndTime
       };
       console.log(result.updatedPlayers, "when winner is declared");
       return res.status(200).json(result);
@@ -666,13 +668,14 @@ const getSnkByGroupId = async function (req, res) {
         _id: snakeLadder._id,
         createdTime: snakeLadder.createdTime,
         currentPoints: randomValue,
-        nextTurn: nextUserId,
+        currentTurn: nextUserId,
         currentTime: new Date(),
         nextTurnTime: updatedData.nextTurnTime,
         tableId: snakeLadder.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
         start: snakeLadder.start,
         isGameOver: snakeLadder.isGameOver,
+        gameEndTime:snakeLadder.gameEndTime
       };
       console.log(result.updatedPlayers, "botplayer condition cerisfied");
       return res.status(200).json(result);
@@ -709,13 +712,14 @@ const getSnkByGroupId = async function (req, res) {
         _id: updateTurn._id,
         createdTime: updateTurn.createdTime,
         currentPoints: 0,
-        nextTurn: updateTurn.updatedPlayers[nextUserIndex].UserId,
+        currentTurn: updateTurn.updatedPlayers[nextUserIndex].UserId,
         currentTime: new Date(),
         nextTurnTime: updateTurn.nextTurnTime,
         tableId: updateTurn.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
         start: updateTurn.start,
         isGameOver: updateTurn.isGameOver,
+        gameEndTime:updateTurn.gameEndTime
       };
       console.log(result.updatedPlayers, "after 8 sec condition satisfied");
       return res.status(200).json(result);
@@ -727,13 +731,14 @@ const getSnkByGroupId = async function (req, res) {
       _id: snakeLadder._id,
       createdTime: snakeLadder.createdTime,
       currentPoints: 0,
-      nextTurn: nxtPlayer.UserId,
+      currentTurn: nxtPlayer.UserId,
       currentTime: new Date(),
       nextTurnTime: snakeLadder.nextTurnTime,
       tableId: snakeLadder.tableId,
       updatedPlayers: snakeLadder.updatedPlayers,
       start: snakeLadder.start,
       isGameOver: snakeLadder.isGameOver,
+      gameEndTime:snakeLadder.gameEndTime
     };
     console.log(result.updatedPlayers, "no condition satisfied");
     return res.status(200).json(result);

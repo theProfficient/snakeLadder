@@ -274,7 +274,7 @@ async function startMatchForSnkLdr(grpId, group) {
     console.log("result", result);
     const matchData = await groupModelForSnakeLadder.findOneAndUpdate(
       { _id: grpId },
-      { updatedPlayers: result, $set: { start: true } },
+      { updatedPlayers: result, $set: { start: true, gameEndTime:Date.now() + 4 * 60 * 1000} },
       { new: true, setDefaultsOnInsert: true }
     );
     console.log("this is updated data >>>>>>>>>>", matchData);

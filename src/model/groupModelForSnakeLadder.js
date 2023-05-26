@@ -54,6 +54,9 @@ const SnakeLadderGroupSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    gameEndTime: {
+      type: Date,
+    },
   },
   { strict: false }
 );
