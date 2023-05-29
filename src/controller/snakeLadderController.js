@@ -177,6 +177,7 @@ const getAllSnak = async function (req, res) {
     let userData = await snkTournamentModel.aggregate([
       {
         $match: {
+          isGameOverForTable: false,
           Users: {
             $elemMatch: {
               UserId: UserId,
