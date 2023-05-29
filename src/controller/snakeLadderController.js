@@ -502,8 +502,7 @@ const getSnkByGroupId = async function (req, res) {
     );
 
     if (timeDiff >= 4 || reachTheDestination) {
-      // checkTable.isGameOverForTable = true;
-      // await snkTournamentModel.save();
+      
       let overTheGame = await snkTournamentModel.updateOne(
         { _id: checkTable._id },
         { isGameOverForTable: true },
