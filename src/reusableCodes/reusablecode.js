@@ -251,9 +251,9 @@ const createGroupForSnakeLadder = async function (tableId) {
           let grpId = createGrp._id;
           let group = createGrp.group;
           console.log(createGrp);
-          setTimeout(function () {
+          // setTimeout(function () {
           startMatchForSnkLdr(grpId, group);
-           }, 5000);
+          //  }, 5000);
         }
       }
     }
@@ -283,7 +283,12 @@ async function startMatchForSnkLdr(grpId, group) {
     let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
     matchData.updatedPlayers[currentPlayerIndex].turn = true;
     matchData.currentUserId = updatedPlayers[currentPlayerIndex].UserId;
-    const updatedGroupFst = await matchData.save();
+    // const updatedGroupFst = await matchData.save();
+    setTimeout(async function () {
+      const updatedGroupFst = await matchData.save();
+      // Rest of your code here...
+    }, 2000);
+    
   }
 }
 
