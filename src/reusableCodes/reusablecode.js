@@ -251,9 +251,9 @@ const createGroupForSnakeLadder = async function (tableId) {
           let grpId = createGrp._id;
           let group = createGrp.group;
           console.log(createGrp);
-          // setTimeout(function () {
+          setTimeout(function () {
           startMatchForSnkLdr(grpId, group);
-          // }, 120000);
+           }, 5000);
         }
       }
     }
