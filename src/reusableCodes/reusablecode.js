@@ -268,7 +268,7 @@ async function startMatchForSnkLdr(grpId, group) {
       UserId: name.UserId,
       userName: name.userName,
       isBot: name.isBot,
-      points: 0,
+      points: 1,
       turn: name.turn,
     }));
     console.log("result", result);
