@@ -278,13 +278,12 @@ async function startMatchForSnkLdr(grpId, group) {
       { new: true, setDefaultsOnInsert: true }
     );
     console.log("this is updated data >>>>>>>>>>", matchData);
-
+    setTimeout(async function () {
     let updatedPlayers = matchData.updatedPlayers;
     let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
     matchData.updatedPlayers[currentPlayerIndex].turn = true;
     matchData.currentUserId = updatedPlayers[currentPlayerIndex].UserId;
     // const updatedGroupFst = await matchData.save();
-    setTimeout(async function () {
       const updatedGroupFst = await matchData.save();
       // Rest of your code here...
     }, 2000);

@@ -161,7 +161,7 @@ const getAllSnak = async function (req, res) {
     //______________only fetch that table which timing is running
 
     const data = await snkTournamentModel
-      .find({ endTime: { $gt: new Date() } })
+      .find({ endTime: { $gt: new Date() }, isGameOverForTable: false})
       .select({
         display: 0,
         createdAt: 0,
@@ -504,7 +504,7 @@ const getSnkByGroupId = async function (req, res) {
     if (timeDiff >= 4 || reachTheDestination) {
       
       let overTheGame = await snkTournamentModel.updateOne(
-        { _id: checkTable._id },
+        { _id: tableId },
         { isGameOverForTable: true },
         { new: true }
       );
