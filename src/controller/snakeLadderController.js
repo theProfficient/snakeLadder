@@ -186,7 +186,7 @@ const getAllSnak = async function (req, res) {
         },
       },
     ]);
-
+console.log(userData,"++++++++++++++++++++")
     if (userData.length > 0) {
       let tableId = userData.map((items) => items._id);
       console.log(tableId, "------------");
@@ -508,7 +508,7 @@ const getSnkByGroupId = async function (req, res) {
         { isGameOverForTable: true },
         { new: true }
       );
-
+console.log(overTheGame,"overTheGame==============")
       let entryFee = checkTable.entryFee;
 
       if (updatedPlayers[0].points === updatedPlayers[1].points) {
@@ -791,7 +791,7 @@ const updatePointOfUser = async function (req, res) {
     let turn = isUserExist.turn;
 
     if (turn === false) {
-      return res.status(400).send({ status: false, message: "not your turn" });
+      return res.status(200).send({ message: "not your turn"});
     }
     const currentUserIndex = updatedPlayers.findIndex(
       (player) => player.UserId === UserId
