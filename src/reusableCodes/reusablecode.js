@@ -282,6 +282,7 @@ async function startMatchForSnkLdr(grpId, group) {
     let updatedPlayers = matchData.updatedPlayers;
     let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
     matchData.updatedPlayers[currentPlayerIndex].turn = true;
+    matchData.lastHitTime = new Date();
     matchData.currentUserId = updatedPlayers[currentPlayerIndex].UserId;
     // const updatedGroupFst = await matchData.save();
       const updatedGroupFst = await matchData.save();

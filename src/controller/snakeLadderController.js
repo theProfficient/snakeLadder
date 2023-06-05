@@ -161,7 +161,7 @@ const getAllSnak = async function (req, res) {
     //______________only fetch that table which timing is running
 
     const data = await snkTournamentModel
-      .find({ endTime: { $gt: new Date() }, isGameOverForTable: false})
+      .find({ endTime: { $gt: new Date() }})
       .select({
         display: 0,
         createdAt: 0,
@@ -503,7 +503,7 @@ const getSnkByGroupId = async function (req, res) {
 
     if (timeDiff >= 4 || reachTheDestination) {
       
-      let overTheGame = await snkTournamentModel.updateOne(
+      let overTheGame = await snkTournamentModel.findByIdAndUpdate(
         { _id: tableId },
         { isGameOverForTable: true },
         { new: true }
@@ -656,6 +656,7 @@ console.log(overTheGame,"overTheGame==============")
 
       snakeLadder.updatedPlayers[currentUserIndex].turn = false;
       snakeLadder.updatedPlayers[nextUserIndex].turn = true;
+      snakeLadder.currentUserId = nextUserId;
       snakeLadder.lastHitTime = new Date();
       snakeLadder.nextTurnTime = new Date(Date.now() + randomValue * 1000);
 
@@ -837,6 +838,7 @@ const updatePointOfUser = async function (req, res) {
     groupExist.updatedPlayers[currentUserIndex].turn = false;
     groupExist.updatedPlayers[nextUserIndex].turn = true;
     groupExist.lastHitTime = new Date();
+    groupExist.currentUserId = nextUserId;
     groupExist.nextTurnTime = new Date(Date.now() + randomValue * 1000);
     let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
       { _id: groupId },
