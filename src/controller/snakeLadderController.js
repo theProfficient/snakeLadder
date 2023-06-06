@@ -161,7 +161,7 @@ const getAllSnak = async function (req, res) {
     //______________only fetch that table which timing is running
 
     const data = await snkTournamentModel
-      .find({ endTime: { $gt: new Date() }})
+      .find({ endTime: { $gt: new Date() }, isGameOverForTable: false })
       .select({
         display: 0,
         createdAt: 0,
@@ -186,7 +186,7 @@ const getAllSnak = async function (req, res) {
         },
       },
     ]);
-console.log(userData,"++++++++++++++++++++")
+    console.log(userData, "++++++++++++++++++++");
     if (userData.length > 0) {
       let tableId = userData.map((items) => items._id);
       console.log(tableId, "------------");
@@ -502,13 +502,12 @@ const getSnkByGroupId = async function (req, res) {
     );
 
     if (timeDiff >= 4 || reachTheDestination) {
-      
       let overTheGame = await snkTournamentModel.findByIdAndUpdate(
         { _id: tableId },
         { isGameOverForTable: true },
         { new: true }
       );
-console.log(overTheGame,"overTheGame==============")
+      console.log(overTheGame, "overTheGame==============");
       let entryFee = checkTable.entryFee;
 
       if (updatedPlayers[0].points === updatedPlayers[1].points) {
@@ -532,7 +531,7 @@ console.log(overTheGame,"overTheGame==============")
           updatedPlayers: overGame.updatedPlayers,
           start: overGame.start,
           isGameOver: overGame.isGameOver,
-          gameEndTime:overGame.gameEndTime
+          gameEndTime: overGame.gameEndTime,
         };
         return res.status(200).json(result);
       }
@@ -600,7 +599,7 @@ console.log(overTheGame,"overTheGame==============")
         updatedPlayers: overGame.updatedPlayers,
         start: overGame.start,
         isGameOver: overGame.isGameOver,
-        gameEndTime:overGame.gameEndTime
+        gameEndTime: overGame.gameEndTime,
       };
       console.log(result.updatedPlayers, "when winner is declared");
       return res.status(200).json(result);
@@ -676,7 +675,7 @@ console.log(overTheGame,"overTheGame==============")
         updatedPlayers: snakeLadder.updatedPlayers,
         start: snakeLadder.start,
         isGameOver: snakeLadder.isGameOver,
-        gameEndTime:snakeLadder.gameEndTime
+        gameEndTime: snakeLadder.gameEndTime,
       };
       console.log(result.updatedPlayers, "botplayer condition cerisfied");
       return res.status(200).json(result);
@@ -720,29 +719,28 @@ console.log(overTheGame,"overTheGame==============")
         updatedPlayers: snakeLadder.updatedPlayers,
         start: updateTurn.start,
         isGameOver: updateTurn.isGameOver,
-        gameEndTime:updateTurn.gameEndTime
+        gameEndTime: updateTurn.gameEndTime,
       };
       console.log(result.updatedPlayers, "after 8 sec condition satisfied");
       return res.status(200).json(result);
+    } else {
+      // Not enough time has passed for the turn to switch
+      let result = {
+        _id: snakeLadder._id,
+        createdTime: snakeLadder.createdTime,
+        currentPoints: 0,
+        currentTurn: nxtPlayer.UserId,
+        currentTime: new Date(),
+        nextTurnTime: snakeLadder.nextTurnTime,
+        tableId: snakeLadder.tableId,
+        updatedPlayers: snakeLadder.updatedPlayers,
+        start: snakeLadder.start,
+        isGameOver: snakeLadder.isGameOver,
+        gameEndTime: snakeLadder.gameEndTime,
+      };
+      console.log(result.updatedPlayers, "no condition satisfied");
+      return res.status(200).json(result);
     }
-    //________________________update table
-
-    //  let updateTable = await snakeLadderModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
-    let result = {
-      _id: snakeLadder._id,
-      createdTime: snakeLadder.createdTime,
-      currentPoints: 0,
-      currentTurn: nxtPlayer.UserId,
-      currentTime: new Date(),
-      nextTurnTime: snakeLadder.nextTurnTime,
-      tableId: snakeLadder.tableId,
-      updatedPlayers: snakeLadder.updatedPlayers,
-      start: snakeLadder.start,
-      isGameOver: snakeLadder.isGameOver,
-      gameEndTime:snakeLadder.gameEndTime
-    };
-    console.log(result.updatedPlayers, "no condition satisfied");
-    return res.status(200).json(result);
   } catch (err) {
     return res.status(500).send({
       status: false,
@@ -779,6 +777,7 @@ const updatePointOfUser = async function (req, res) {
         .send({ status: false, message: "groupId is not present" });
     }
     let updatedPlayers = groupExist.updatedPlayers;
+
     let isUserExist = groupExist.updatedPlayers.find(
       (players) => players.UserId === UserId
     );
@@ -792,7 +791,7 @@ const updatePointOfUser = async function (req, res) {
     let turn = isUserExist.turn;
 
     if (turn === false) {
-      return res.status(200).send({ message: "not your turn"});
+      return res.status(200).send({ message: "not your turn" });
     }
     const currentUserIndex = updatedPlayers.findIndex(
       (player) => player.UserId === UserId
@@ -828,23 +827,28 @@ const updatePointOfUser = async function (req, res) {
       96: 32,
     };
     if (currentPosition in snakeLadderAndTunnel) {
-      groupExist.updatedPlayers[currentUserIndex].points =
+      updatedPlayers[currentUserIndex].points =
         snakeLadderAndTunnel[currentPosition];
       hit = true;
     } else {
-      groupExist.updatedPlayers[currentUserIndex].points = currentPosition;
+      updatedPlayers[currentUserIndex].points = currentPosition;
     }
 
-    groupExist.updatedPlayers[currentUserIndex].turn = false;
-    groupExist.updatedPlayers[nextUserIndex].turn = true;
+    updatedPlayers[currentUserIndex].turn = false;
+    updatedPlayers[nextUserIndex].turn = true;
+    groupExist.updatedPlayers = updatedPlayers;
     groupExist.lastHitTime = new Date();
     groupExist.currentUserId = nextUserId;
     groupExist.nextTurnTime = new Date(Date.now() + randomValue * 1000);
-    let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
-      { _id: groupId },
-      { $set: groupExist },
-      { new: true }
-    );
+
+    // let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
+    //   { _id: groupId },
+    //   { $set: groupExist },
+    //   { new: true }
+    // );
+
+    let updatedData = await groupExist.save();
+
     let updatedUser = updatedData.updatedPlayers[currentUserIndex];
     let result = {
       currentPoints: randomValue,
