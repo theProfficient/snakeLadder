@@ -697,6 +697,7 @@ const getSnkByGroupId = async function (req, res) {
       const nextUserId = updatedPlayers[nextUserIndex].UserId;
       snakeLadder.currentUserId = nextUserId;
       snakeLadder.lastHitTime = new Date();
+      snakeLadder[currentUserIndex].dicePoints = 0;
       snakeLadder.updatedPlayers[nextUserIndex].turn = true;
       snakeLadder.updatedPlayers[currentUserIndex].turn = false;
       snakeLadder.nextTurnTime = new Date(Date.now() + 1 * 1000);
