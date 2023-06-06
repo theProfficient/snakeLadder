@@ -484,6 +484,7 @@ const getSnkByGroupId = async function (req, res) {
     const updatedPlayers = snakeLadder.updatedPlayers;
     let timeDiff = Math.abs(createdTime.getMinutes() - new Date().getMinutes());
     let nxtPlayer = updatedPlayers.find((players) => players.turn === true);
+    const cnrtPlayer = updatedPlayers.find((players) => players.turn === false);
     const checkTable = await snkTournamentModel
       .findById({ _id: tableId })
       .lean();
@@ -652,7 +653,7 @@ const getSnkByGroupId = async function (req, res) {
       } else {
         snakeLadder.updatedPlayers[currentUserIndex].points = currentPosition;
       }
-
+      snakeLadder.updatedPlayers[currentUserIndex].dicePoints = randomValue;
       snakeLadder.updatedPlayers[currentUserIndex].turn = false;
       snakeLadder.updatedPlayers[nextUserIndex].turn = true;
       snakeLadder.currentUserId = nextUserId;
@@ -677,7 +678,7 @@ const getSnkByGroupId = async function (req, res) {
         isGameOver: snakeLadder.isGameOver,
         gameEndTime: snakeLadder.gameEndTime,
       };
-      console.log(result.updatedPlayers, "botplayer condition cerisfied");
+      console.log(result.currentPoints, "botplayer condition cerisfied");
       return res.status(200).json(result);
     }
 
@@ -728,7 +729,7 @@ const getSnkByGroupId = async function (req, res) {
       let result = {
         _id: snakeLadder._id,
         createdTime: snakeLadder.createdTime,
-        currentPoints: 0,
+        currentPoints: cnrtPlayer.dicePoints,
         currentTurn: nxtPlayer.UserId,
         currentTime: new Date(),
         nextTurnTime: snakeLadder.nextTurnTime,
@@ -833,7 +834,7 @@ const updatePointOfUser = async function (req, res) {
     } else {
       updatedPlayers[currentUserIndex].points = currentPosition;
     }
-
+    updatedPlayers[currentUserIndex].dicePoints = randomValue;
     updatedPlayers[currentUserIndex].turn = false;
     updatedPlayers[nextUserIndex].turn = true;
     groupExist.updatedPlayers = updatedPlayers;

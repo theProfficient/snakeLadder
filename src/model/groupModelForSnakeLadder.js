@@ -26,11 +26,15 @@ const SnakeLadderGroupSchema = new mongoose.Schema(
         },
         points: {
             type: Number,
-            default:1,
+            default:0,
           },
           turn:{
             type:Boolean,
             default:false
+          },
+          dicePoints:{
+            type:Number,
+            default:0
           }
       },
     ],
