@@ -669,7 +669,7 @@ const getSnkByGroupId = async function (req, res) {
         _id: snakeLadder._id,
         createdTime: snakeLadder.createdTime,
         currentPoints: randomValue,
-        currentTurn: currentUserIndex.UserId,
+        currentTurn: botPlayerId,
         currentTime: new Date(),
         nextTurnTime: updatedData.nextTurnTime,
         tableId: snakeLadder.tableId,
