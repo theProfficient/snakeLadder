@@ -17,6 +17,7 @@ Router.put("/updateUser", userController.updateUser);
 
 Router.get("/profile", userController.getUser);
 
+Router.get("/getAllUser", userController.getAllUser);
 //_____________________ Cricket________________________
 
 Router.put("/updateCricket", cricketController.updateCric);

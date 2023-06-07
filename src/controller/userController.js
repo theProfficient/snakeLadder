@@ -134,6 +134,27 @@ const getUser = async function (req, res) {
   }
 };
 
+const getAllUser = async function (req, res) {
+  try {
+const getUsers = await userModel.find()
+
+    if (getUsers.length == 0) {
+      return res.status(404).send({
+        status: false,
+        message: "user not found",
+      });
+    }
+
+    return res.status(200).json(getUsers)
+      
+  } catch (err) {
+    return res.status(500).send({
+      status: false,
+      error: err.message,
+    });
+  }
+};
+
 // ___update user
 
 const updateUser = async function (req, res) {
@@ -190,4 +211,4 @@ const updateUser = async function (req, res) {
   }
 };
 
-module.exports = { createUsers, getUser, updateUser };
+module.exports = { createUsers, getUser, updateUser, getAllUser };
