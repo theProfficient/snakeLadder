@@ -164,6 +164,8 @@ const updateUser = async function (req, res) {
 
     let { userName, email, phone, credits, status } = updateData;
 
+    console.log(updateData);
+
     if (Object.keys(updateData).length == 0) {
       return res.status(400).send({
         status: false,
@@ -197,7 +199,7 @@ const updateUser = async function (req, res) {
         message: "you can't update UserId",
       });
     }
-
+    console.log("after updating tble data",userUpdate);
     return res.status(200).send({
       status: true,
       message: "Success",
