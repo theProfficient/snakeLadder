@@ -1,5 +1,6 @@
 const express = require("express");
 
+const adminController = require("../controller/adminController")
 const userController = require("../controller/userController");
 const cricketController = require("../controller/cricketController");
 const hockyController = require("../controller/hockyController");
@@ -9,6 +10,9 @@ const balanceController = require("../controller/balanceController");
 const tournamentController = require("../controller/tournamentController");
 const Router = express.Router();
 
+//__________________________Admin_____________________
+Router.post("/register", adminController.createAdmin);
+Router.get("/login", adminController.adminLoggedin);
 //_____________________________________User______________
 
 Router.get("/register", userController.createUsers);
