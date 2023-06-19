@@ -199,7 +199,7 @@ const updateUser = async function (req, res) {
         message: "you can't update UserId",
       });
     }
-
+    console.log("after updating tble data",userUpdate);
     return res.status(200).send({
       status: true,
       message: "Success",
