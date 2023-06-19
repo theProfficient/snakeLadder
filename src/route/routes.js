@@ -12,7 +12,7 @@ const Router = express.Router();
 
 //__________________________Admin_____________________
 Router.post("/register", adminController.createAdmin);
-Router.get("/login", adminController.adminLoggedin);
+Router.post("/login", adminController.adminLoggedin);
 //_____________________________________User______________
 
 Router.get("/register", userController.createUsers);
