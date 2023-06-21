@@ -270,7 +270,8 @@ async function startMatchForSnkLdr(grpId, group) {
       isBot: name.isBot,
       points: 0,
       turn: name.turn,
-      dicePoints:0
+      dicePoints:0,
+      diceHitted:false
     }));
     console.log("result", result);
     const matchData = await groupModelForSnakeLadder.findOneAndUpdate(
