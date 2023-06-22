@@ -8,6 +8,7 @@ const {
   startMatch,
   createGroupForSnakeLadder,
 } = require("../reusableCodes/reusablecode");
+const { log } = require("console");
 //_________________________________________________createSnakeLadder tournaments____________________________________
 
 const createSnakeLadderTables = async function (req, res) {
@@ -63,7 +64,7 @@ const createSnakeLadderTables = async function (req, res) {
 
       tournamentTable1 = await snkTournamentModel.create(data1);
       tableId1 = tournamentTable1._id;
-      console.log(tournamentTable1);
+      // console.log(tournamentTable1);
     }
 
     setInterval(createTournament1, 60000);
@@ -83,7 +84,7 @@ const createSnakeLadderTables = async function (req, res) {
 
       tournamentTable2 = await snkTournamentModel.create(data2);
       tableId2 = tournamentTable2._id;
-      console.log(tournamentTable2);
+      // console.log(tournamentTable2);
     }
 
     setInterval(createTournament2, 240000);
@@ -101,7 +102,7 @@ const createSnakeLadderTables = async function (req, res) {
       data3.endTime = req.query.endTime = endTime;
       tournamentTable3 = await snkTournamentModel.create(data3);
       tableId3 = tournamentTable3._id;
-      console.log(tournamentTable3);
+      // console.log(tournamentTable3);
     }
     setInterval(createTournament3, 300000);
     createTournament3();
@@ -117,7 +118,7 @@ const createSnakeLadderTables = async function (req, res) {
       data4.endTime = req.query.endTime = endTime;
       tournamentTable4 = await snkTournamentModel.create(data4);
       tableId4 = tournamentTable4._id;
-      console.log(tournamentTable4);
+      // console.log(tournamentTable4);
     }
     setInterval(createTournament4, 600000);
     createTournament4();
@@ -133,7 +134,7 @@ const createSnakeLadderTables = async function (req, res) {
       data5.endTime = req.query.endTime = endTime;
       tournamentTable5 = await snkTournamentModel.create(data5);
       tableId5 = tournamentTable5._id;
-      console.log(tournamentTable5);
+      // console.log(tournamentTable5);
     }
     setInterval(createTournament5, 900000);
     createTournament5();
@@ -498,7 +499,7 @@ const getSnkByGroupId = async function (req, res) {
     //_________________________winner declare_____________
 
     let reachTheDestination = updatedPlayers.find(
-      (players) => players.points === 100
+      (players) => players.points === 99
     );
 
     if (timeDiff >= 4 || reachTheDestination) {
@@ -533,6 +534,7 @@ const getSnkByGroupId = async function (req, res) {
           isGameOver: overGame.isGameOver,
           gameEndTime: overGame.gameEndTime,
         };
+        console.log("dicepoints and position of player",result.updatedPlayers);
         return res.status(200).json(result);
       }
 
@@ -627,23 +629,23 @@ const getSnkByGroupId = async function (req, res) {
       // check for snakes and ladders and tunnel
       const currentPosition = botPlayer.points + randomValue;
       const snakeLadderAndTunnel = {
-        5: 12,
-        7: 42,
-        14: 8,
-        15: 48,
-        23: 31,
-        25: 17,
-        26: 57,
-        33: 62,
-        37: 4,
-        38: 50,
-        46: 71,
-        54: 77,
-        61: 67,
-        73: 49,
-        80: 57,
-        88: 69,
-        96: 32,
+        4: 11,
+        6: 41,
+        13: 7,
+        14: 47,
+        22: 30,
+        24: 16,
+        25: 56,
+        32: 61,
+        36: 3,
+        37: 49,
+        45: 70,
+        53: 76,
+        60: 66,
+        72: 48,
+        79: 56,
+        87: 68,
+        95: 31,
       };
       if (currentPosition in snakeLadderAndTunnel) {
         snakeLadder.updatedPlayers[currentUserIndex].points =
@@ -678,7 +680,7 @@ const getSnkByGroupId = async function (req, res) {
         isGameOver: snakeLadder.isGameOver,
         gameEndTime: snakeLadder.gameEndTime,
       };
-      console.log(new Date().getSeconds(),snakeLadder.updatedPlayers,">>>>>>>>>>>>>>>>>>>>>>>")
+      // console.log(new Date().getSeconds(),snakeLadder.updatedPlayers,">>>>>>>>>>>>>>>>>>>>>>>")
       setTimeout(() => {
         snakeLadder.currentUserId = nextUserId;
         snakeLadder.lastHitTime = new Date();
@@ -688,7 +690,7 @@ const getSnkByGroupId = async function (req, res) {
         snakeLadder.save();
         console.log("after 8 sec in put >>>>>>>>>>",new Date().getSeconds(),snakeLadder)
       },8000);
-
+      console.log("dicepoints and position of player",snakeLadder.updatedPlayers);
       return res.status(200).json(result);
     }
 
@@ -736,7 +738,8 @@ const getSnkByGroupId = async function (req, res) {
         isGameOver: updateTurn.isGameOver,
         gameEndTime: updateTurn.gameEndTime,
       };
-      console.log(result.updatedPlayers, "after 8 sec condition satisfied");
+      // console.log(result.updatedPlayers, "after 8 sec condition satisfied");
+      console.log("dicepoints and position of player",result.updatedPlayers);
       return res.status(200).json(result);
     } else {
       // Not enough time has passed for the turn to switch
@@ -753,7 +756,8 @@ const getSnkByGroupId = async function (req, res) {
         isGameOver: snakeLadder.isGameOver,
         gameEndTime: snakeLadder.gameEndTime,
       };
-      console.log(result.updatedPlayers, "no condition satisfied");
+      // console.log(result.updatedPlayers, "no condition satisfied");
+      console.log("dicepoints and position of player",result.updatedPlayers);
       return res.status(200).json(result);
     }
   } catch (err) {
@@ -809,6 +813,7 @@ const updatePointOfUser = async function (req, res) {
       return res.status(200).send({ message: "not your turn" });
     }
     if (isUserExist.diceHitted === true) {
+      console.log("dicepoints and position of player",groupExist.updatedPlayers);
       return res.status(200).send({ message: "you already hitted the dice" });
     }
     const currentUserIndex = updatedPlayers.findIndex(
@@ -826,23 +831,23 @@ const updatePointOfUser = async function (req, res) {
     const currentPosition =
       updatedPlayers[currentUserIndex].points + randomValue;
     const snakeLadderAndTunnel = {
-      5: 12,
-      7: 42,
-      14: 8,
-      15: 48,
-      23: 31,
-      25: 17,
-      26: 57,
-      33: 62,
-      37: 4,
-      38: 50,
-      46: 71,
-      54: 77,
-      61: 67,
-      73: 49,
-      80: 57,
-      88: 69,
-      96: 32,
+      4: 11,
+      6: 41,
+      13: 7,
+      14: 47,
+      22: 30,
+      24: 16,
+      25: 56,
+      32: 61,
+      36: 3,
+      37: 49,
+      45: 70,
+      53: 76,
+      60: 66,
+      72: 48,
+      79: 56,
+      87: 68,
+      95: 31,
     };
     if (currentPosition in snakeLadderAndTunnel) {
       updatedPlayers[currentUserIndex].points =
@@ -892,6 +897,8 @@ const updatePointOfUser = async function (req, res) {
       groupExist.save();
       console.log("after 8 sec in get >>>>>>>>>>",new Date().getSeconds(),groupExist)
     }, 8000);
+
+    console.log("dicepoints and position of player",groupExist.updatedPlayers);
     return res.status(200).json(result);
   } catch (err) {
     return res.status(500).send({
