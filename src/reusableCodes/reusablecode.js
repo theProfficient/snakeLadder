@@ -273,6 +273,7 @@ async function startMatchForSnkLdr(grpId, group) {
       dicePoints:0,
       diceHitted:false,
       currentPoints:0
+
     }));
     console.log("result", result);
     const matchData = await groupModelForSnakeLadder.findOneAndUpdate(
@@ -281,12 +282,16 @@ async function startMatchForSnkLdr(grpId, group) {
       { new: true, setDefaultsOnInsert: true }
     );
     console.log("this is updated data >>>>>>>>>>", matchData);
+    //setTimeout(async function () {
     let updatedPlayers = matchData.updatedPlayers;
     let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
     matchData.updatedPlayers[currentPlayerIndex].turn = true;
     matchData.lastHitTime = new Date();
     matchData.currentUserId = updatedPlayers[currentPlayerIndex].UserId;
+    // const updatedGroupFst = await matchData.save();
       const updatedGroupFst = await matchData.save();
+      // Rest of your code here...
+    //}, 2000);
     
   }
 }

@@ -409,7 +409,7 @@ const getGroupsByUser = async function (req, res) {
     let userName = userExist.userName;
 
     const table = await groupModelForSnakeLadder.find({ tableId: tableId });
-    console.log(table);
+    console.log("table>>>>>>>>>>>>>>",table);
 
     if (table.length === 0) {
       return res.status(404).send({
