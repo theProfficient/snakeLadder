@@ -522,15 +522,11 @@ const getSnkByGroupId = async function (req, res) {
           { new: true }
         );
         let result = {
-          _id: snakeLadder._id,
-          createdTime: snakeLadder.createdTime,
-          currentPoints: 0,
           currentTurn: "game is over",
           currentTime: new Date(),
           nextTurnTime: new Date(),
           tableId: snakeLadder.tableId,
           updatedPlayers: overGame.updatedPlayers,
-          start: overGame.start,
           isGameOver: overGame.isGameOver,
           gameEndTime: overGame.gameEndTime,
         };
@@ -591,15 +587,11 @@ const getSnkByGroupId = async function (req, res) {
       // continue with the rest of the code here...
 
       let result = {
-        _id: snakeLadder._id,
-        createdTime: snakeLadder.createdTime,
-        currentPoints: 0,
         currentTurn: "game is over",
         currentTime: new Date(),
         nextTurnTime: new Date(),
         tableId: snakeLadder.tableId,
         updatedPlayers: overGame.updatedPlayers,
-        start: overGame.start,
         isGameOver: overGame.isGameOver,
         gameEndTime: overGame.gameEndTime,
       };
@@ -657,6 +649,8 @@ const getSnkByGroupId = async function (req, res) {
       snakeLadder.updatedPlayers[currentUserIndex].dicePoints = randomValue;
       snakeLadder.updatedPlayers[nextUserIndex].dicePoints = 0;
       snakeLadder.updatedPlayers[currentUserIndex].diceHitted = true;
+      snakeLadder.updatedPlayers[currentUserIndex].currentPoints = currentPosition;
+
       // snakeLadder.updatedPlayers[nextUserIndex].turn = true;
       // snakeLadder.currentUserId = nextUserId;
       // snakeLadder.lastHitTime = new Date();
@@ -668,18 +662,15 @@ const getSnkByGroupId = async function (req, res) {
         { new: true }
       );
       let result = {
-        _id: snakeLadder._id,
-        createdTime: snakeLadder.createdTime,
-        currentPoints: randomValue,
         currentTurn: nextUserId,
         currentTime: new Date(),
         nextTurnTime: updatedData.nextTurnTime,
         tableId: snakeLadder.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
-        start: snakeLadder.start,
         isGameOver: snakeLadder.isGameOver,
         gameEndTime: snakeLadder.gameEndTime,
       };
+      console.log(result.updatedPlayers);
       // console.log(new Date().getSeconds(),snakeLadder.updatedPlayers,">>>>>>>>>>>>>>>>>>>>>>>")
       setTimeout(() => {
         snakeLadder.currentUserId = nextUserId;
@@ -726,15 +717,11 @@ const getSnkByGroupId = async function (req, res) {
       );
 
       let result = {
-        _id: updateTurn._id,
-        createdTime: updateTurn.createdTime,
-        currentPoints: 0,
         currentTurn: updateTurn.updatedPlayers[nextUserIndex].UserId,
         currentTime: new Date(),
         nextTurnTime: updateTurn.nextTurnTime,
         tableId: updateTurn.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
-        start: updateTurn.start,
         isGameOver: updateTurn.isGameOver,
         gameEndTime: updateTurn.gameEndTime,
       };
@@ -744,15 +731,11 @@ const getSnkByGroupId = async function (req, res) {
     } else {
       // Not enough time has passed for the turn to switch
       let result = {
-        _id: snakeLadder._id,
-        createdTime: snakeLadder.createdTime,
-        currentPoints: cnrtPlayer.dicePoints,
         currentTurn: cnrtPlayer.UserId,
         currentTime: new Date(),
         nextTurnTime: snakeLadder.nextTurnTime,
         tableId: snakeLadder.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
-        start: snakeLadder.start,
         isGameOver: snakeLadder.isGameOver,
         gameEndTime: snakeLadder.gameEndTime,
       };
@@ -858,6 +841,7 @@ const updatePointOfUser = async function (req, res) {
     }
     updatedPlayers[currentUserIndex].dicePoints = randomValue;
      updatedPlayers[currentUserIndex].diceHitted = true;
+     updatedPlayers[currentUserIndex].currentPoints = currentPosition;
     // updatedPlayers[nextUserIndex].turn = true;
     groupExist.updatedPlayers = updatedPlayers;
     // groupExist.lastHitTime = new Date();
@@ -874,7 +858,6 @@ const updatePointOfUser = async function (req, res) {
 
     let updatedUser = updatedData.updatedPlayers[currentUserIndex];
     let result = {
-      currentPoints: randomValue,
       nextTurn: nextUserId,
       currentTime: new Date(),
       nextTurnTime: updatedData.nextTurnTime,
@@ -885,8 +868,9 @@ const updatePointOfUser = async function (req, res) {
       totalPoints: updatedUser.points,
       turn: updatedUser.turn,
     };
+    console.log(updatedData.updatedPlayers,"++++++++++put api");
 
-    console.log(new Date().getSeconds())
+    // console.log(new Date().getSeconds())
     // Delay the turn transition by 8 seconds using setTimeout
     setTimeout(() => {
       groupExist.lastHitTime = new Date();
