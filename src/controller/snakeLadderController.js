@@ -64,7 +64,7 @@ const createSnakeLadderTables = async function (req, res) {
 
       tournamentTable1 = await snkTournamentModel.create(data1);
       tableId1 = tournamentTable1._id;
-      // console.log(tournamentTable1);
+      console.log(tournamentTable1);
     }
 
     setInterval(createTournament1, 60000);
@@ -613,11 +613,10 @@ const getSnkByGroupId = async function (req, res) {
       const nextUserIndex = (currentUserIndex + 1) % updatedPlayers.length;
       const nextUserId = updatedPlayers[nextUserIndex].UserId;
       const possibleValues = [1, 2, 3, 4, 5, 6];
-
+    
       const randomIndex = Math.floor(Math.random() * possibleValues.length);
-
       const randomValue = possibleValues[randomIndex];
-
+    
       // check for snakes and ladders and tunnel
       const currentPosition = botPlayer.points + randomValue;
       const snakeLadderAndTunnel = {
@@ -639,28 +638,36 @@ const getSnkByGroupId = async function (req, res) {
         87: 68,
         95: 31,
       };
+    
       if (currentPosition in snakeLadderAndTunnel) {
-        snakeLadder.updatedPlayers[currentUserIndex].points =
-          snakeLadderAndTunnel[currentPosition];
+        snakeLadder.updatedPlayers[currentUserIndex].points = snakeLadderAndTunnel[currentPosition];
         hit = true;
       } else {
         snakeLadder.updatedPlayers[currentUserIndex].points = currentPosition;
       }
+    
       snakeLadder.updatedPlayers[currentUserIndex].dicePoints = randomValue;
       snakeLadder.updatedPlayers[nextUserIndex].dicePoints = 0;
       snakeLadder.updatedPlayers[currentUserIndex].diceHitted = true;
       snakeLadder.updatedPlayers[currentUserIndex].currentPoints = currentPosition;
-
-      // snakeLadder.updatedPlayers[nextUserIndex].turn = true;
-      // snakeLadder.currentUserId = nextUserId;
-      // snakeLadder.lastHitTime = new Date();
+    
       snakeLadder.nextTurnTime = new Date(Date.now() + randomValue * 1000);
-
+    
       let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
         { _id: groupId },
         { $set: snakeLadder },
         { new: true }
       );
+          // Countdown Timer for remaining time
+          let countdown = Math.ceil((updatedData.nextTurnTime - Date.now()) / 1000);
+          let countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown === 0) {
+              clearInterval(countdownInterval);
+            }
+            console.log("Countdown:", countdown);
+          }, 1000);
+
       let result = {
         currentTurn: nextUserId,
         currentTime: new Date(),
@@ -670,8 +677,9 @@ const getSnkByGroupId = async function (req, res) {
         isGameOver: snakeLadder.isGameOver,
         gameEndTime: snakeLadder.gameEndTime,
       };
+    
       console.log(result.updatedPlayers);
-      // console.log(new Date().getSeconds(),snakeLadder.updatedPlayers,">>>>>>>>>>>>>>>>>>>>>>>")
+    
       setTimeout(() => {
         snakeLadder.currentUserId = nextUserId;
         snakeLadder.lastHitTime = new Date();
@@ -679,12 +687,15 @@ const getSnkByGroupId = async function (req, res) {
         snakeLadder.updatedPlayers[nextUserIndex].turn = true;
         snakeLadder.updatedPlayers[nextUserIndex].diceHitted = false;
         snakeLadder.save();
-        console.log("after 8 sec in put >>>>>>>>>>",new Date().getSeconds(),snakeLadder)
-      },8000);
-      console.log("dicepoints and position of player",snakeLadder.updatedPlayers);
+        console.log("After 8 seconds in put >>>>>>>>>>", new Date().getSeconds(), snakeLadder);
+      }, 8000);
+    
+
+    
+      console.log("Dice points and position of player", snakeLadder.updatedPlayers);
       return res.status(200).json(result);
     }
-
+    
     //___________Check if it's time to switch turn to next user
 
     const timeSinceLastHit =
@@ -856,6 +867,16 @@ const updatePointOfUser = async function (req, res) {
 
     let updatedData = await groupExist.save();
 
+          // Countdown Timer for remaining time
+          let countdown = Math.ceil((updatedData.nextTurnTime - Date.now()) / 1000);
+          let countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown === 0) {
+              clearInterval(countdownInterval);
+            }
+            console.log("Countdown:", countdown);
+          }, 1000);
+          
     let updatedUser = updatedData.updatedPlayers[currentUserIndex];
     let result = {
       nextTurn: nextUserId,
@@ -881,6 +902,15 @@ const updatePointOfUser = async function (req, res) {
       groupExist.save();
       console.log("after 8 sec in get >>>>>>>>>>",new Date().getSeconds(),groupExist)
     }, 8000);
+
+      // let countdown = Math.ceil((updatedData.nextTurnTime - Date.now()) / 1000);
+      // let countdownInterval = setInterval(() => {
+      //   countdown--;
+      //   if (countdown === 0) {
+      //     clearInterval(countdownInterval);
+      //   }
+      //   console.log("Countdown:", countdown);
+      // }, 1000);
 
     console.log("dicepoints and position of player",groupExist.updatedPlayers);
     return res.status(200).json(result);
