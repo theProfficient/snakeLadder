@@ -633,7 +633,7 @@ const getSnkByGroupId = async function (req, res) {
       let result = {
         currentTurn: nextUserId,
         currentTime: new Date(),
-        nextTurnTime:remainingTime,
+        remainingTime:remainingTime,
         nextTurnTime: updatedData.nextTurnTime,
         tableId: snakeLadder.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
@@ -700,7 +700,7 @@ const getSnkByGroupId = async function (req, res) {
       let result = {
         currentTurn: nextUserId,
         currentTime: new Date(),
-        nextTurnTime:remainingTime,
+        remainingTime:remainingTime,
         nextTurnTime: updatedData.nextTurnTime,
         tableId: snakeLadder.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
@@ -757,20 +757,21 @@ const getSnkByGroupId = async function (req, res) {
       snakeLadder.updatedPlayers[nextUserIndex].diceHitted = false;
       snakeLadder.updatedPlayers[currentUserIndex].turn = false;
       snakeLadder.updatedPlayers[currentUserIndex].diceHitted= false;
-      //snakeLadder.nextTurnTime = new Date(Date.now() + 8 * 1000);
+      // snakeLadder.nextTurnTime = new Date(Date.now() + 1 * 1000);
 
       //___________Save updated snakeLadder to database
 
       let updateTurn = await groupModelForSnakeLadder.findByIdAndUpdate(
         { _id: groupId },
-        { $set: {snakeLadder, nextTurnTime:new Date(Date.now() + 8 * 1000) }},
+        { $set: {snakeLadder, nextTurnTime:new Date(Date.now() + randomValue * 1000) }},
         { new: true }
       );
-const remainingTime = Math.ceil((updatedData.nextTurnTime - Date.now()) / 1000);
+      const remainingTime = Math.ceil((updateTurn.nextTurnTime - Date.now()) / 1000);
       let result = {
         currentTurn: updateTurn.updatedPlayers[nextUserIndex].UserId,
         currentTime: new Date(),
-        nextTurnTime: remainingTime,
+        nextTurnTime: updateTurn.nextTurnTime,
+        remainingTime:remainingTime,
         tableId: updateTurn.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
         isGameOver: updateTurn.isGameOver,
@@ -785,7 +786,8 @@ const remainingTime = Math.ceil((updatedData.nextTurnTime - Date.now()) / 1000);
       let result = {
         currentTurn: cnrtPlayer.UserId,
         currentTime: new Date(),
-        nextTurnTime: remainingTime,
+        nextTurnTime: snakeLadder.nextTurnTime,
+        remainingTime:remainingTime,
         tableId: snakeLadder.tableId,
         updatedPlayers: snakeLadder.updatedPlayers,
         isGameOver: snakeLadder.isGameOver,
@@ -810,6 +812,7 @@ const updatePointOfUser = async function (req, res) {
     let UserId = req.query.UserId;
     let groupId = req.query.groupId;
     let hit = false;
+    
     if (!UserId && !groupId) {
       return res.status(400).send({
         status: false,
@@ -825,6 +828,9 @@ const updatePointOfUser = async function (req, res) {
     let groupExist = await groupModelForSnakeLadder.findById({
       _id: groupId,
     });
+
+    // const remainingTime1 = Math.ceil((groupExist.nextTurnTime - Date.now()) / 1000);
+    // console.log(remainingTime1,"time in sec")
     if (!groupExist) {
       return res
         .status(404)
@@ -871,7 +877,7 @@ const updatePointOfUser = async function (req, res) {
         updatedPlayers[currentUserIndex].diceHitted = true;
         updatedPlayers[currentUserIndex].currentPoints = currentPosition;
        groupExist.updatedPlayers = updatedPlayers;
-       groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
+       groupExist.nextTurnTime = new Date(Date.now() + randomValue * 1000);
    
        let updatedData = await groupExist.save();
    
@@ -881,7 +887,7 @@ const updatePointOfUser = async function (req, res) {
          nextTurn: nextUserId,
          currentTime: new Date(),
          nextTurnTime: updatedData.nextTurnTime,
-         nextTurnTime:remainingTime,
+         remainingTime:remainingTime,
          userName: updatedUser.userName,
          UserId: updatedUser.UserId,
          prize: updatedUser.prize,
@@ -935,7 +941,7 @@ const updatePointOfUser = async function (req, res) {
     groupExist.updatedPlayers = updatedPlayers;
     // groupExist.lastHitTime = new Date();
     // groupExist.currentUserId = nextUserId;
-    groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
+    groupExist.nextTurnTime = new Date(Date.now() + randomValue * 1000);
 
     // let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
     //   { _id: groupId },
@@ -961,7 +967,7 @@ const updatePointOfUser = async function (req, res) {
       nextTurn: nextUserId,
       currentTime: new Date(),
       nextTurnTime: updatedData.nextTurnTime,
-      nextTurnTime:remainingTime,
+      remainingTime:remainingTime,
       userName: updatedUser.userName,
       UserId: updatedUser.UserId,
       prize: updatedUser.prize,
