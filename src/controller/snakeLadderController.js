@@ -59,7 +59,7 @@ const createSnakeLadderTables = async function (req, res) {
         createGroupForSnakeLadder(tableId1);
       }
 
-      endTime = Date.now() + 1 * 60 * 1000;
+      endTime = Date.now() + 1 * 20 * 1000;
       data1.endTime = req.query.endTime = endTime;
 
       tournamentTable1 = await snkTournamentModel.create(data1);
@@ -67,7 +67,7 @@ const createSnakeLadderTables = async function (req, res) {
       console.log(tournamentTable1);
     }
 
-    setInterval(createTournament1, 60000);
+    setInterval(createTournament1, 20000);
 
     createTournament1();
 
