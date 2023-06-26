@@ -104,7 +104,7 @@ const getUser = async function (req, res) {
   try {
     let UserId = req.query.UserId;
 
-    const getNewUser = await userModel.findOne({ UserId: UserId }).select({history:0});
+    const getNewUser = await userModel.findOne({ UserId: UserId });
     let cricket = await cricketModel.findOne({ UserId: UserId });
     let hocky = await hockyModel.findOne({ UserId: UserId });
     let snakeLadder = await snakeLadderModel.findOne({ UserId: UserId });
