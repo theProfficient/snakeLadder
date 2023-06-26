@@ -586,7 +586,7 @@ const updateTournament = async function (req, res) {
     let userHistory = await userModel.findOneAndUpdate(
       { UserId: UserId },
       {
-        $push: { history: { tableId: tableId, time: time } },
+        $push: { history: {gameType:"cricket", tableId: tableId, time: time } },
         $inc: {
           credits: -entryFee,
         },
