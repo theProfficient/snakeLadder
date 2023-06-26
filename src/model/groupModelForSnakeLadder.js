@@ -36,10 +36,6 @@ const SnakeLadderGroupSchema = new mongoose.Schema(
             type:Number,
             default:0
           },
-          diceHitted:{
-            type:Boolean,
-            default:false
-          },
           currentPoints:{
             type: Number,
             default:0
