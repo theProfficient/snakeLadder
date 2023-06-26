@@ -941,15 +941,6 @@ const updatePointOfUser = async function (req, res) {
     //   console.log("after 8 sec in get >>>>>>>>>>",new Date().getSeconds(),groupExist)
     // }, 8000);
 
-    // let countdown = Math.ceil((updatedData.nextTurnTime - Date.now()) / 1000);
-    // let countdownInterval = setInterval(() => {
-    //   countdown--;
-    //   if (countdown === 0) {
-    //     clearInterval(countdownInterval);
-    //   }
-    //   console.log("Countdown:", countdown);
-    // }, 1000);
-
     console.log("dicepoints and position of player", groupExist.updatedPlayers);
     return res.status(200).json(result);
   } catch (err) {
