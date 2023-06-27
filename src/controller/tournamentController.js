@@ -538,8 +538,7 @@ const updateTournament = async function (req, res) {
     
     let ExistPlayers = existTable.players;
     let entryFee = existTable.entryFee;
-
-    let maxPlayers = 100;
+    let maxPlayers = existTable.maxPlayers;
 
     if (ExistPlayers < maxPlayers) {
       status = "in_progress";
