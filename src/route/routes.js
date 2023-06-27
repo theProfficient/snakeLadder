@@ -33,6 +33,8 @@ Router.get("/getCricGrp", cricketController.getCricByGroupId);
 Router.get("/winner", cricketController.winTheGame);
 //______Cricket tournaments_________
 
+Router.post("/tournamentsByAdmin", tournamentController.tournamentsByAdmin);
+
 Router.post("/tournaments", tournamentController.createTournaments);
 
 Router.get("/tables", tournamentController.getAllTables);

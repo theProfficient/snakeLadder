@@ -11,6 +11,50 @@ const {
   startMatch,
   runUpdateBalls,
 } = require("../reusableCodes/reusablecode");
+
+//________________________________________create tournaments for admin panel________________
+
+const tournamentsByAdmin = async function (req,res){
+  try{
+    let {
+      entryFee,
+      prizeAmount,
+      players,
+      status,
+      maxTime,
+      endTime,
+      rank,
+      rank1,
+      rank2,
+      rank3,
+      rank4,
+      tableByAdmin
+    } = req.body;
+
+    endTime = Date.now() + req.body.maxTime * 60 * 1000;
+    req.body.endTime = endTime;
+    req.body.tableByAdmin = true;
+   
+      let tableByAdmin1I = await tournamentModel.create(req.body);
+      let tableId1I= tableByAdmin1I._id;
+      createGroup(tableId1I);
+      console.log(tableByAdmin1I);
+
+    return res.status(201).send({
+      status: true,
+      message: "Success",
+      data: tableByAdmin1I,
+    });
+
+  }catch(error){
+    return res.status(500).send({
+      status: false,
+      message: error.message,
+    });
+
+  }
+}
+
 //__________________________________________________create all Tournaments
 
 const createTournaments = async function (req, res) {
@@ -709,6 +753,7 @@ const getPlayers = async function (req, res) {
 };
 
 module.exports = {
+  tournamentsByAdmin,
   createTournaments,
   updateTournament,
   getAllTables,
