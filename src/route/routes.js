@@ -55,6 +55,8 @@ Router.get("/getAllHockyData", hockyController.getAllHoc);
 
 //__________________snakeLadder Tournaments___________________
 
+Router.post("/snktournamentsByAdmin", snakeLadderController.snkTablesCreatedByAdmin);
+
 Router.post("/snktournaments", snakeLadderController.createSnakeLadderTables);
 
 Router.get("/getAllSnakeLadderData", snakeLadderController.getAllSnak);

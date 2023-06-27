@@ -534,18 +534,20 @@ const updateTournament = async function (req, res) {
         message: " This table is not present ",
       });
     }
+
+    
     let ExistPlayers = existTable.players;
     let entryFee = existTable.entryFee;
 
-    let maxPlayes = 100;
+    let maxPlayers = 100;
 
-    if (ExistPlayers < maxPlayes) {
+    if (ExistPlayers < maxPlayers) {
       status = "in_progress";
     }
-    if (ExistPlayers === maxPlayes - 1) {
+    if (ExistPlayers === maxPlayers - 1) {
       status = "full";
     }
-    if (ExistPlayers > maxPlayes - 1) {
+    if (ExistPlayers > maxPlayers - 1) {
       return res.status(400).send({ status: false, message: " Full " });
     }
 

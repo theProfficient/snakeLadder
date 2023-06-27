@@ -9,6 +9,48 @@ const {
   createGroupForSnakeLadder,
 } = require("../reusableCodes/reusablecode");
 const { log } = require("console");
+
+//____________________________________create snakeladder tournaments by admin___________
+
+const snkTablesCreatedByAdmin = async function (req, res) {
+  try {
+    let {
+      entryFee,
+      prizeAmount,
+      players,
+      status,
+      maxTime,
+      endTime,
+      rank,
+      rank1,
+      rank2,
+      rank3,
+      rank4,
+      tableByAdmin,
+    } = req.body;
+
+    endTime = Date.now() + req.body.maxTime * 60 * 1000;
+    req.body.endTime = endTime;
+    req.body.tableByAdmin = true;
+
+    let tableByAdmin1I = await snkTournamentModel.create(req.body);
+    let tableId1 = tableByAdmin1I._id;
+    createGroupForSnakeLadder(tableId1);
+    console.log(tableByAdmin1I);
+
+    return res.status(201).send({
+      status: true,
+      message: "Success",
+      data: tableByAdmin1I,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      status: false,
+      message: error.message,
+    });
+  }
+};
+
 //_________________________________________________createSnakeLadder tournaments____________________________________
 
 const createSnakeLadderTables = async function (req, res) {
@@ -244,140 +286,144 @@ const getAllSnak = async function (req, res) {
 
 const updateSnakLdrTournaments = async function (req, res) {
   try {
-  let tableId = req.query.tableId;
-  let UserId = req.query.UserId;
-  let updateData = req.query;
-  let { status } = updateData;
+    let tableId = req.query.tableId;
+    let UserId = req.query.UserId;
+    let updateData = req.query;
+    let { status } = updateData;
 
-  if (Object.keys(updateData).length == 0) {
-    return res.status(400).send({
-      status: false,
-      message: "For updating please enter atleast one key",
-    });
-  }
+    if (Object.keys(updateData).length == 0) {
+      return res.status(400).send({
+        status: false,
+        message: "For updating please enter atleast one key",
+      });
+    }
 
-  if (!mongoose.Types.ObjectId.isValid(tableId)) {
-    return res.status(400).send({ status: false, message: "invalid tableId" });
-  }
+    if (!mongoose.Types.ObjectId.isValid(tableId)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "invalid tableId" });
+    }
 
-  let existTable = await snkTournamentModel.findById({ _id: tableId });
-  if (!existTable) {
-    return res.status(404).send({
-      status: false,
-      message: " This table is not present ",
-    });
-  }
-  let ExistPlayers = existTable.players;
-  let entryFee = existTable.entryFee;
+    let existTable = await snkTournamentModel.findById({ _id: tableId });
+    if (!existTable) {
+      return res.status(404).send({
+        status: false,
+        message: " This table is not present ",
+      });
+    }
+    let ExistPlayers = existTable.players;
+    let entryFee = existTable.entryFee;
+    let maxPlayers = existTable.maxPlayers
 
-  let maxPlayes = 100;
 
-  if (ExistPlayers < maxPlayes) {
-    status = "in_progress";
-  }
-  if (ExistPlayers === maxPlayes - 1) {
-    status = "full";
-  }
-  if (ExistPlayers > maxPlayes - 1) {
-    return res.status(400).send({ status: false, message: " Full " });
-  }
+    // let maxPlayers = 100;
 
-  //________________________________find user,s Name _____________________________________
+    if (ExistPlayers < maxPlayers) {
+      status = "in_progress";
+    }
+    if (ExistPlayers === maxPlayers - 1) {
+      status = "full";
+    }
+    if (ExistPlayers > maxPlayers - 1) {
+      return res.status(400).send({ status: false, message: " Full " });
+    }
 
-  let userExist = await userModel.findOne({ UserId: UserId });
-  if (!userExist) {
-    return res.status(404).send({
-      status: false,
-      message: " user not found",
-    });
-  }
-  const { userName, isBot, credits } = userExist;
+    //________________________________find user,s Name _____________________________________
 
-  if (credits < entryFee) {
-    return res.status(404).send({
-      status: false,
-      message: " insufficient balance to play",
-    });
-  }
+    let userExist = await userModel.findOne({ UserId: UserId });
+    if (!userExist) {
+      return res.status(404).send({
+        status: false,
+        message: " user not found",
+      });
+    }
+    const { userName, isBot, credits } = userExist;
 
-  //_______update table with userId and tableId (if user joined perticular table players incereses by 1 automatically)
+    if (credits < entryFee) {
+      return res.status(404).send({
+        status: false,
+        message: " insufficient balance to play",
+      });
+    }
 
-  let userData = await snkTournamentModel.aggregate([
-    {
-      $match: {
-        isGameOverForTable: false,
-        Users: {
-          $elemMatch: {
-            UserId: UserId,
+    //_______update table with userId and tableId (if user joined perticular table players incereses by 1 automatically)
+
+    let userData = await snkTournamentModel.aggregate([
+      {
+        $match: {
+          isGameOverForTable: false,
+          Users: {
+            $elemMatch: {
+              UserId: UserId,
+            },
           },
         },
       },
-    },
-  ]);
+    ]);
 
-  if (userData.length !== 0) {
-    for (let i = 0; i < userData.length; i++) {
-      let time = userData[i].endTime;
-      console.log(time.getMinutes(), "time___________");
-      console.log(
-        existTable.endTime.getMinutes(),
-        "time which he want to join___________"
-      );
-      if (Math.abs(time.getMinutes() - existTable.endTime.getMinutes()) < 5) {
-        return res.status(400).send({
-          status: false,
-          message: " You can not join",
-        });
+    if (userData.length !== 0) {
+      for (let i = 0; i < userData.length; i++) {
+        let time = userData[i].endTime;
+        console.log(time.getMinutes(), "time___________");
+        console.log(
+          existTable.endTime.getMinutes(),
+          "time which he want to join___________"
+        );
+        if (Math.abs(time.getMinutes() - existTable.endTime.getMinutes()) < 5) {
+          return res.status(400).send({
+            status: false,
+            message: " You can not join",
+          });
+        }
       }
     }
-  }
-  //_________________deduct the entryFee from the users credit when user want to join the table
+    //_________________deduct the entryFee from the users credit when user want to join the table
 
-  const tableUpdate = await snkTournamentModel
-    .findByIdAndUpdate(
-      { _id: tableId },
-      {
-        $inc: { players: 1 },
-        $push: {
-          Users: {
-            UserId: UserId,
-            userName: userName,
-            isBot: isBot,
-            joined: true,
-            endTime: existTable.endTime,
+    const tableUpdate = await snkTournamentModel
+      .findByIdAndUpdate(
+        { _id: tableId },
+        {
+          $inc: { players: 1 },
+          $push: {
+            Users: {
+              UserId: UserId,
+              userName: userName,
+              isBot: isBot,
+              joined: true,
+              endTime: existTable.endTime,
+            },
           },
+          $set: { status: status },
         },
-        $set: { status: status },
-      },
 
+        { new: true }
+      )
+      .select({ players: 1, _id: 0 });
+
+    //_______store user's tournament history in user profile
+
+    let time = existTable.createdAt;
+    let userHistory = await userModel.findOneAndUpdate(
+      { UserId: UserId },
+      {
+        $push: {
+          history: { gameType: "snakeLadder", tableId: tableId, time: time },
+        },
+        $inc: {
+          credits: -entryFee,
+        },
+      },
       { new: true }
-    )
-    .select({ players: 1, _id: 0 });
-
-  //_______store user's tournament history in user profile
-
-  let time = existTable.createdAt;
-  let userHistory = await userModel.findOneAndUpdate(
-    { UserId: UserId },
-    {
-      $push: {
-        history: { gameType: "snakeLadder", tableId: tableId, time: time },
+    );
+    // console.log("users data after deduct the credit >>>>>>>>>>>>>",userHistory)
+    return res.status(200).send({
+      status: true,
+      message: "Success",
+      data: {
+        tableUpdate,
+        balance: userHistory.credits,
       },
-      $inc: {
-        credits: -entryFee,
-      },
-    },
-    { new: true }
-  );
-  // console.log("users data after deduct the credit >>>>>>>>>>>>>",userHistory)
-  return res.status(200).send({
-    status: true,
-    message: "Success",
-    data: {
-      tableUpdate,
-      balance: userHistory.credits,
-    },
-  });
+    });
   } catch (err) {
     return res.status(500).send({
       status: false,
@@ -886,8 +932,8 @@ const updatePointOfUser = async function (req, res) {
         nextTurn: nextUserId,
         currentTime: new Date(),
         nextTurnTime: updatedData.nextTurnTime,
-        currentPoints:currentPosition,
-        dicePoints:randomValue,
+        currentPoints: currentPosition,
+        dicePoints: randomValue,
         userName: updatedUser.userName,
         UserId: updatedUser.UserId,
         prize: updatedUser.prize,
@@ -895,7 +941,7 @@ const updatePointOfUser = async function (req, res) {
         totalPoints: updatedUser.points,
         turn: updatedUser.turn,
       };
-      console.log(result,"===========================")
+      console.log(result, "===========================");
       return res.status(200).json(result);
     }
     if (currentPosition in snakeLadderAndTunnel) {
@@ -922,7 +968,7 @@ const updatePointOfUser = async function (req, res) {
       currentTime: new Date(),
       nextTurnTime: updatedData.nextTurnTime,
       currentPoints: currentPosition,
-      dicePoints:randomValue,
+      dicePoints: randomValue,
       userName: updatedUser.userName,
       UserId: updatedUser.UserId,
       prize: updatedUser.prize,
@@ -930,7 +976,7 @@ const updatePointOfUser = async function (req, res) {
       totalPoints: updatedUser.points,
       turn: updatedUser.turn,
     };
-    console.log(result,"==========================")
+    console.log(result, "==========================");
     // setTimeout(() => {
     //   groupExist.lastHitTime = new Date();
     //   groupExist.currentUserId = nextUserId;
@@ -942,7 +988,6 @@ const updatePointOfUser = async function (req, res) {
     // }, 8000);
 
     return res.status(200).json(result);
-    
   } catch (err) {
     return res.status(500).send({
       status: false,
@@ -981,6 +1026,7 @@ const getPlayersOfSnkLadder = async function (req, res) {
 };
 
 module.exports = {
+  snkTablesCreatedByAdmin,
   updateSnakLdrTournaments,
   getAllSnak,
   createSnakeLadderTables,
