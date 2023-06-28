@@ -672,23 +672,23 @@ const getSnkByGroupId = async function (req, res) {
 
       // Check for snakes, ladders, and tunnels
       const snakeLadderAndTunnel = {
-        4: 11,
-        6: 41,
-        13: 7,
-        14: 47,
-        22: 30,
-        24: 16,
-        25: 56,
-        32: 61,
-        36: 3,
-        37: 49,
-        45: 70,
-        53: 76,
-        60: 66,
-        72: 48,
-        79: 56,
-        87: 68,
-        95: 31,
+        4: 11, //--------------tunnel
+        6: 41, //--------------ladder
+        13: 7, //--------------snake
+        14: 47, //--------------ladder
+        22: 30, //--------------tunnel
+        24: 16, //--------------snake
+        25: 56, //--------------Ladder
+        32: 61, //--------------Ladder
+        36: 3, //--------------snake
+        37: 49, //--------------tunnel
+        45: 70, //--------------Ladder
+        53: 76, //--------------Laadder
+        60: 66, //--------------tunnel
+        72: 48, //--------------snake
+        79: 56, //--------------snake
+        87: 68, //--------------snake
+        95: 31, //--------------snake
       };
 
       if (currentPosition > 99) {
@@ -728,8 +728,23 @@ const getSnkByGroupId = async function (req, res) {
         // Update position based on snakes, ladders, and tunnels
         snakeLadder.updatedPlayers[currentUserIndex].points =
           snakeLadderAndTunnel[currentPosition];
+        snakeLadder.updatedPlayers[currentUserIndex].movement =
+          currentPosition === 6 ||
+          currentPosition === 14 ||
+          currentPosition === 25 ||
+          currentPosition === 32 ||
+          currentPosition === 45 ||
+          currentPosition === 53
+            ? "Ladder"
+            : currentPosition === 4 ||
+              currentPosition === 22 ||
+              currentPosition === 37 ||
+              currentPosition === 60
+            ? "Tunnel"
+            : "Snake";
       } else {
         snakeLadder.updatedPlayers[currentUserIndex].points = currentPosition;
+        snakeLadder.updatedPlayers[currentUserIndex].movement = '';
       }
 
       snakeLadder.updatedPlayers[currentUserIndex].dicePoints = randomValue;
@@ -896,23 +911,23 @@ const updatePointOfUser = async function (req, res) {
       updatedPlayers[currentUserIndex].points + randomValue;
 
     const snakeLadderAndTunnel = {
-      4: 11,
-      6: 41, //ladder
-      13: 7,
-      14: 47, //ladder
-      22: 30,
-      24: 16,
-      25: 56, //Ladder
-      32: 61, //Ladder
-      36: 3,
-      37: 49,
-      45: 70, //Ladder
-      53: 76, //Laadder
-      60: 66,
-      72: 48,
-      79: 56,
-      87: 68,
-      95: 31,
+      4: 11, //--------------tunnel
+      6: 41, //--------------ladder
+      13: 7, //--------------snake
+      14: 47, //--------------ladder
+      22: 30, //--------------tunnel
+      24: 16, //--------------snake
+      25: 56, //--------------Ladder
+      32: 61, //--------------Ladder
+      36: 3, //--------------snake
+      37: 49, //--------------tunnel
+      45: 70, //--------------Ladder
+      53: 76, //--------------Laadder
+      60: 66, //--------------tunnel
+      72: 48, //--------------snake
+      79: 56, //--------------snake
+      87: 68, //--------------snake
+      95: 31, //--------------snake
     };
     if (currentPosition > 99) {
       updatedPlayers[currentUserIndex].dicePoints = randomValue;
@@ -960,10 +975,25 @@ const updatePointOfUser = async function (req, res) {
     if (currentPosition in snakeLadderAndTunnel) {
       updatedPlayers[currentUserIndex].points =
         snakeLadderAndTunnel[currentPosition];
-      hit = true;
+      updatedPlayers[currentUserIndex].movement =
+        currentPosition === 6 ||
+        currentPosition === 14 ||
+        currentPosition === 25 ||
+        currentPosition === 32 ||
+        currentPosition === 45 ||
+        currentPosition === 53
+          ? "Ladder"
+          : currentPosition === 4 ||
+            currentPosition === 22 ||
+            currentPosition === 37 ||
+            currentPosition === 60
+          ? "Tunnel"
+          : "Snake";
     } else {
       updatedPlayers[currentUserIndex].points = currentPosition;
+      updatedPlayers[currentUserIndex].movement = '';
     }
+
     updatedPlayers[currentUserIndex].dicePoints = randomValue;
     updatedPlayers[currentUserIndex].currentPoints = currentPosition;
     // updatedPlayers[currentUserIndex].turn = false;
@@ -983,22 +1013,21 @@ const updatePointOfUser = async function (req, res) {
       currentPosition === 45 ||
       currentPosition === 53
     ) {
+      let result = {
+        nextTurn: nextUserId,
+        currentTime: new Date(),
+        nextTurnTime: new Date(Date.now() + 4 * 1000),
+        currentPoints: currentPosition,
+        dicePoints: randomValue,
+        userName: updatedUser.userName,
+        UserId: updatedUser.UserId,
+        prize: updatedUser.prize,
+        isBot: updatedUser.isBot,
+        totalPoints: updatedUser.points,
+        turn: updatedUser.turn,
+      };
+      console.log(result, "==========================");
 
-    let result = {
-      nextTurn: nextUserId,
-      currentTime: new Date(),
-      nextTurnTime: new Date(Date.now() + 4 * 1000),
-      currentPoints: currentPosition,
-      dicePoints: randomValue,
-      userName: updatedUser.userName,
-      UserId: updatedUser.UserId,
-      prize: updatedUser.prize,
-      isBot: updatedUser.isBot,
-      totalPoints: updatedUser.points,
-      turn: updatedUser.turn,
-    };
-    console.log(result, "==========================");
-    
       setTimeout(() => {
         groupExist.lastHitTime = new Date();
         groupExist.currentUserId = nextUserId;
@@ -1042,7 +1071,6 @@ const updatePointOfUser = async function (req, res) {
       }, 2000);
       return res.status(200).json(result);
     }
-    
   } catch (err) {
     return res.status(500).send({
       status: false,

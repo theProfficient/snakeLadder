@@ -272,7 +272,8 @@ async function startMatchForSnkLdr(grpId, group) {
       turn: name.turn,
       dicePoints:0,
       diceHitted:false,
-      currentPoints:0
+      currentPoints:0,
+      movement:''
 
     }));
     console.log("result", result);

@@ -39,6 +39,10 @@ const SnakeLadderGroupSchema = new mongoose.Schema(
           currentPoints:{
             type: Number,
             default:0
+          },
+          movement:{
+            type: String,
+            default:''
           }
       },
     ],
