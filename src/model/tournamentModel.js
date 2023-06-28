@@ -19,6 +19,17 @@ const tournamentSchema = new mongoose.Schema(
       trim: true,
     },
 
+    maxPlayers: {
+      type: Number,
+      default:100,
+      trim: true,
+    },
+
+    tableByAdmin: {
+      type: Boolean,
+      default:false,
+    },
+
     players: {
       type: Number,
       required: true,

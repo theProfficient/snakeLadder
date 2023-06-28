@@ -11,6 +11,50 @@ const {
   startMatch,
   runUpdateBalls,
 } = require("../reusableCodes/reusablecode");
+
+//________________________________________create tournaments for admin panel________________
+
+const tournamentsByAdmin = async function (req,res){
+  try{
+    let {
+      entryFee,
+      prizeAmount,
+      players,
+      status,
+      maxTime,
+      endTime,
+      rank,
+      rank1,
+      rank2,
+      rank3,
+      rank4,
+      tableByAdmin
+    } = req.body;
+
+    endTime = Date.now() + req.body.maxTime * 60 * 1000;
+    req.body.endTime = endTime;
+    req.body.tableByAdmin = true;
+   
+      let tableByAdmin1I = await tournamentModel.create(req.body);
+      let tableId1I= tableByAdmin1I._id;
+      createGroup(tableId1I);
+      console.log(tableByAdmin1I);
+
+    return res.status(201).send({
+      status: true,
+      message: "Success",
+      data: tableByAdmin1I,
+    });
+
+  }catch(error){
+    return res.status(500).send({
+      status: false,
+      message: error.message,
+    });
+
+  }
+}
+
 //__________________________________________________create all Tournaments
 
 const createTournaments = async function (req, res) {
@@ -490,18 +534,19 @@ const updateTournament = async function (req, res) {
         message: " This table is not present ",
       });
     }
+
+    
     let ExistPlayers = existTable.players;
     let entryFee = existTable.entryFee;
+    let maxPlayers = existTable.maxPlayers;
 
-    let maxPlayes = 100;
-
-    if (ExistPlayers < maxPlayes) {
+    if (ExistPlayers < maxPlayers) {
       status = "in_progress";
     }
-    if (ExistPlayers === maxPlayes - 1) {
+    if (ExistPlayers === maxPlayers - 1) {
       status = "full";
     }
-    if (ExistPlayers > maxPlayes - 1) {
+    if (ExistPlayers > maxPlayers - 1) {
       return res.status(400).send({ status: false, message: " Full " });
     }
 
@@ -709,6 +754,7 @@ const getPlayers = async function (req, res) {
 };
 
 module.exports = {
+  tournamentsByAdmin,
   createTournaments,
   updateTournament,
   getAllTables,

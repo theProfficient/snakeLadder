@@ -33,6 +33,8 @@ Router.get("/getCricGrp", cricketController.getCricByGroupId);
 Router.get("/winner", cricketController.winTheGame);
 //______Cricket tournaments_________
 
+Router.post("/tournamentsByAdmin", tournamentController.tournamentsByAdmin);
+
 Router.post("/tournaments", tournamentController.createTournaments);
 
 Router.get("/tables", tournamentController.getAllTables);
@@ -52,6 +54,8 @@ Router.put("/updateHocky", hockyController.updateHoc);
 Router.get("/getAllHockyData", hockyController.getAllHoc);
 
 //__________________snakeLadder Tournaments___________________
+
+Router.post("/snktournamentsByAdmin", snakeLadderController.snkTablesCreatedByAdmin);
 
 Router.post("/snktournaments", snakeLadderController.createSnakeLadderTables);
 
