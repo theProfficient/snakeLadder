@@ -872,14 +872,24 @@ const updatePointOfUser = async function (req, res) {
     if (currentPosition > 99) {
       updatedPlayers[currentUserIndex].dicePoints = randomValue;
       updatedPlayers[currentUserIndex].currentPoints = currentPosition;
-      updatedPlayers[currentUserIndex].turn = false;
-      updatedPlayers[nextUserIndex].turn = true;
+      // updatedPlayers[currentUserIndex].turn = false;
+      // updatedPlayers[nextUserIndex].turn = true;
       groupExist.updatedPlayers = updatedPlayers;
-      groupExist.lastHitTime = new Date();
-      groupExist.currentUserId = nextUserId;
+      // groupExist.lastHitTime = new Date();
+      // groupExist.currentUserId = nextUserId;
       groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
 
-      let updatedData = await groupExist.save();
+      let updatedData = await groupExist.save(); 
+
+      setTimeout(() => {
+        groupExist.lastHitTime = new Date();
+        groupExist.currentUserId = nextUserId;
+        groupExist.updatedPlayers[currentUserIndex].turn = false;
+        groupExist.updatedPlayers[nextUserIndex].turn = true;
+        //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
+        groupExist.save();
+        console.log("after 8 sec in get >>>>>>>>>>",new Date().getSeconds(),groupExist)
+      }, 8000);
 
       let updatedUser = updatedData.updatedPlayers[currentUserIndex];
       let result = {
@@ -896,6 +906,7 @@ const updatePointOfUser = async function (req, res) {
         turn: updatedUser.turn,
       };
       console.log(result,"===========================")
+      
       return res.status(200).json(result);
     }
     if (currentPosition in snakeLadderAndTunnel) {
@@ -907,14 +918,24 @@ const updatePointOfUser = async function (req, res) {
     }
     updatedPlayers[currentUserIndex].dicePoints = randomValue;
     updatedPlayers[currentUserIndex].currentPoints = currentPosition;
-    updatedPlayers[currentUserIndex].turn = false;
-    updatedPlayers[nextUserIndex].turn = true;
+    // updatedPlayers[currentUserIndex].turn = false;
+    // updatedPlayers[nextUserIndex].turn = true;
     groupExist.updatedPlayers = updatedPlayers;
-    groupExist.lastHitTime = new Date();
-    groupExist.currentUserId = nextUserId;
+    // groupExist.lastHitTime = new Date();
+    // groupExist.currentUserId = nextUserId;
     groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
 
     let updatedData = await groupExist.save();
+
+    setTimeout(() => {
+      groupExist.lastHitTime = new Date();
+      groupExist.currentUserId = nextUserId;
+      groupExist.updatedPlayers[currentUserIndex].turn = false;
+      groupExist.updatedPlayers[nextUserIndex].turn = true;
+      //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
+      groupExist.save();
+      console.log("after 8 sec in get >>>>>>>>>>",new Date().getSeconds(),groupExist)
+    }, 8000);
 
     let updatedUser = updatedData.updatedPlayers[currentUserIndex];
     let result = {
@@ -931,15 +952,6 @@ const updatePointOfUser = async function (req, res) {
       turn: updatedUser.turn,
     };
     console.log(result,"==========================")
-    // setTimeout(() => {
-    //   groupExist.lastHitTime = new Date();
-    //   groupExist.currentUserId = nextUserId;
-    //   groupExist.updatedPlayers[currentUserIndex].turn = false;
-    //   groupExist.updatedPlayers[nextUserIndex].turn = true;
-    //   groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
-    //   groupExist.save();
-    //   console.log("after 8 sec in get >>>>>>>>>>",new Date().getSeconds(),groupExist)
-    // }, 8000);
 
     return res.status(200).json(result);
     
