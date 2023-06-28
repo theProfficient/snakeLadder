@@ -701,7 +701,7 @@ const getSnkByGroupId = async function (req, res) {
         snakeLadder.lastHitTime = new Date();
         snakeLadder.updatedPlayers[currentUserIndex].turn = false;
         snakeLadder.updatedPlayers[nextUserIndex].turn = true;
-        snakeLadder.nextTurnTime = new Date(Date.now() + 8 * 1000);
+        snakeLadder.nextTurnTime = new Date(Date.now() + 2 * 1000);
         snakeLadder.lastHitTime = new Date();
 
         let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
@@ -739,7 +739,7 @@ const getSnkByGroupId = async function (req, res) {
       snakeLadder.currentUserId = nextUserId;
       snakeLadder.updatedPlayers[currentUserIndex].turn = false;
       snakeLadder.updatedPlayers[nextUserIndex].turn = true;
-      snakeLadder.nextTurnTime = new Date(Date.now() + 8 * 1000);
+      snakeLadder.nextTurnTime = new Date(Date.now() + 2 * 1000);
       snakeLadder.lastHitTime = new Date();
       let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
         { _id: groupId },
@@ -785,7 +785,7 @@ const getSnkByGroupId = async function (req, res) {
       snakeLadder.updatedPlayers[nextUserIndex].dicePoints = 0;
       snakeLadder.updatedPlayers[nextUserIndex].turn = true;
       snakeLadder.updatedPlayers[currentUserIndex].turn = false;
-      snakeLadder.nextTurnTime = new Date(Date.now() + 8 * 1000);
+      snakeLadder.nextTurnTime = new Date(Date.now() + 2 * 1000);
       snakeLadder.lastHitTime = new Date();
 
       // snakeLadder.nextTurnTime = new Date(Date.now() + 1 * 1000);
@@ -922,7 +922,7 @@ const updatePointOfUser = async function (req, res) {
       groupExist.updatedPlayers = updatedPlayers;
       // groupExist.lastHitTime = new Date();
       // groupExist.currentUserId = nextUserId;
-      groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
+      groupExist.nextTurnTime = new Date(Date.now() + 2 * 1000);
 
       let updatedData = await groupExist.save();
 
@@ -971,15 +971,23 @@ const updatePointOfUser = async function (req, res) {
     groupExist.updatedPlayers = updatedPlayers;
     // groupExist.lastHitTime = new Date();
     // groupExist.currentUserId = nextUserId;
-    groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
+    groupExist.nextTurnTime = new Date(Date.now() + 2 * 1000);
 
     let updatedData = await groupExist.save();
-
     let updatedUser = updatedData.updatedPlayers[currentUserIndex];
+    if (
+      currentPosition === 6 ||
+      currentPosition === 14 ||
+      currentPosition === 25 ||
+      currentPosition === 32 ||
+      currentPosition === 45 ||
+      currentPosition === 53
+    ) {
+
     let result = {
       nextTurn: nextUserId,
       currentTime: new Date(),
-      nextTurnTime: updatedData.nextTurnTime,
+      nextTurnTime: new Date(Date.now() + 4 * 1000),
       currentPoints: currentPosition,
       dicePoints: randomValue,
       userName: updatedUser.userName,
@@ -990,14 +998,7 @@ const updatePointOfUser = async function (req, res) {
       turn: updatedUser.turn,
     };
     console.log(result, "==========================");
-    if (
-      currentPosition === 6 ||
-      currentPosition === 14 ||
-      currentPosition === 25 ||
-      currentPosition === 32 ||
-      currentPosition === 45 ||
-      currentPosition === 53
-    ) {
+    
       setTimeout(() => {
         groupExist.lastHitTime = new Date();
         groupExist.currentUserId = nextUserId;
@@ -1011,7 +1012,21 @@ const updatePointOfUser = async function (req, res) {
           groupExist
         );
       }, 4000);
+      return res.status(200).json(result);
     } else {
+      let result = {
+        nextTurn: nextUserId,
+        currentTime: new Date(),
+        nextTurnTime: updatedData.nextTurnTime,
+        currentPoints: currentPosition,
+        dicePoints: randomValue,
+        userName: updatedUser.userName,
+        UserId: updatedUser.UserId,
+        prize: updatedUser.prize,
+        isBot: updatedUser.isBot,
+        totalPoints: updatedUser.points,
+        turn: updatedUser.turn,
+      };
       setTimeout(() => {
         groupExist.lastHitTime = new Date();
         groupExist.currentUserId = nextUserId;
@@ -1025,8 +1040,9 @@ const updatePointOfUser = async function (req, res) {
           groupExist
         );
       }, 2000);
+      return res.status(200).json(result);
     }
-    return res.status(200).json(result);
+    
   } catch (err) {
     return res.status(500).send({
       status: false,
