@@ -197,7 +197,7 @@ const createSnakeLadderTables = async function (req, res) {
 //______________________________________________get all data of SnakeLadder tournaments______________________________
 
 const getAllSnak = async function (req, res) {
-  try {
+  //try {
     let UserId = req.query.UserId;
     let currentTime = new Date();
 
@@ -274,12 +274,12 @@ const getAllSnak = async function (req, res) {
       currentTime: currentTime,
       data: data,
     });
-  } catch (error) {
-    return res.status(500).send({
-      status: false,
-      message: error.message,
-    });
-  }
+  // } catch (error) {
+  //   return res.status(500).send({
+  //     status: false,
+  //     message: error.message,
+  //   });
+  // }
 };
 
 //___________________________________________________update snakeLaddertournament_______________________________
