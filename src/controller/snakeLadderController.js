@@ -527,10 +527,10 @@ const getSnkByGroupId = async function (req, res) {
     let createdTime = snakeLadder.createdTime;
     const updatedPlayers = snakeLadder.updatedPlayers;
     let timeDiff = Math.abs(createdTime.getMinutes() - new Date().getMinutes());
-    let nxtPlayer = updatedPlayers.find((players) => players.turn === true);
-    const cnrtPlayer = updatedPlayers.find(
-      (players) => players.dicePoints !== 0
-    );
+    let crntPlayer = updatedPlayers.find((players) => players.turn === true);
+    // const cnrtPlayer = updatedPlayers.find(
+    //   (players) => players.dicePoints !== 0
+    // );
     const checkTable = await snkTournamentModel
       .findById({ _id: tableId })
       .lean();
@@ -828,11 +828,11 @@ const getSnkByGroupId = async function (req, res) {
       return res.status(200).json(result);
     } else {
       // Not enough time has passed for the turn to switch
-      const cnrtPlayer = updatedPlayers.find(
-        (players) => players.dicePoints !== 0
-      );
+      // const cnrtPlayer = updatedPlayers.find(
+      //   (players) => players.dicePoints !== 0
+      // );
       let result = {
-        currentTurn: cnrtPlayer.UserId,
+        currentTurn: crntPlayer.UserId,
         currentTime: new Date(),
         nextTurnTime: snakeLadder.nextTurnTime,
         tableId: snakeLadder.tableId,
