@@ -691,37 +691,41 @@ const getSnkByGroupId = async function (req, res) {
         95: 31, //--------------snake
       };
 
-      if (currentPosition > 99) {
-        // If position exceeds 99, handle game logic
-        snakeLadder.updatedPlayers[currentUserIndex].dicePoints = randomValue;
-        snakeLadder.updatedPlayers[nextUserIndex].dicePoints = 0;
-        snakeLadder.updatedPlayers[currentUserIndex].currentPoints =
-          currentPosition;
-        snakeLadder.currentUserId = nextUserId;
-        snakeLadder.lastHitTime = new Date();
-        snakeLadder.updatedPlayers[currentUserIndex].turn = false;
-        snakeLadder.updatedPlayers[nextUserIndex].turn = true;
-        snakeLadder.nextTurnTime = new Date(Date.now() + 8 * 1000);
-        snakeLadder.lastHitTime = new Date();
+      // if (currentPosition > 99) {
+      //   // If position exceeds 99, handle game logic
+      //   snakeLadder.updatedPlayers[currentUserIndex].dicePoints = randomValue;
+      //   snakeLadder.updatedPlayers[nextUserIndex].dicePoints = 0;
+      //   snakeLadder.updatedPlayers[currentUserIndex].currentPoints =
+      //     currentPosition;
+      //   snakeLadder.currentUserId = nextUserId;
+      //   snakeLadder.lastHitTime = new Date();
+      //   snakeLadder.updatedPlayers[currentUserIndex].turn = false;
+      //   snakeLadder.updatedPlayers[nextUserIndex].turn = true;
+      //   snakeLadder.nextTurnTime = new Date(Date.now() + 8 * 1000);
+      //   snakeLadder.lastHitTime = new Date();
 
-        let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
-          { _id: groupId },
-          {
-            $set: snakeLadder,
-          },
-          { new: true }
-        );
-        let result = {
-          currentTurn: nextUserId,
-          currentTime: new Date(),
-          nextTurnTime: updatedData.nextTurnTime,
-          tableId: snakeLadder.tableId,
-          updatedPlayers: updatedData.updatedPlayers,
-          isGameOver: snakeLadder.isGameOver,
-          gameEndTime: snakeLadder.gameEndTime,
-        };
-        return res.status(200).json(result);
+      //   let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
+      //     { _id: groupId },
+      //     {
+      //       $set: snakeLadder,
+      //     },
+      //     { new: true }
+      //   );
+      //   let result = {
+      //     currentTurn: nextUserId,
+      //     currentTime: new Date(),
+      //     nextTurnTime: updatedData.nextTurnTime,
+      //     tableId: snakeLadder.tableId,
+      //     updatedPlayers: updatedData.updatedPlayers,
+      //     isGameOver: snakeLadder.isGameOver,
+      //     gameEndTime: snakeLadder.gameEndTime,
+      //   };
+      //   return res.status(200).json(result);
+      // }
+      if (currentPosition > 99) {
+        currentPosition = 99;
       }
+      
       
       if (currentPosition in snakeLadderAndTunnel) {
         // Update position based on snakes, ladders, and tunnels
@@ -868,6 +872,235 @@ const getSnkByGroupId = async function (req, res) {
 
 //_____________________________________update points of user________________________________________
 
+// const updatePointOfUser = async function (req, res) {
+//   try {
+//     let UserId = req.query.UserId;
+//     let groupId = req.query.groupId;
+//     let hit = false;
+
+//     if (!UserId && !groupId) {
+//       return res.status(400).send({
+//         status: false,
+//         message: "please provide both groupId and UserId",
+//       });
+//     }
+//     if (!mongoose.Types.ObjectId.isValid(groupId)) {
+//       return res
+//         .status(400)
+//         .send({ status: false, message: "invalid groupId" });
+//     }
+
+//     let groupExist = await groupModelForSnakeLadder.findById({
+//       _id: groupId,
+//     });
+//     if (!groupExist) {
+//       return res
+//         .status(404)
+//         .send({ status: false, message: "groupId is not present" });
+//     }
+//     let updatedPlayers = groupExist.updatedPlayers;
+
+//     let isUserExist = groupExist.updatedPlayers.find(
+//       (players) => players.UserId === UserId
+//     );
+
+//     if (!isUserExist) {
+//       return res.status(404).send({
+//         status: false,
+//         message: "this user is not present in this group",
+//       });
+//     }
+//     let turn = isUserExist.turn;
+
+//     if (turn === false) {
+//       return res.status(200).send({ message: "not your turn" });
+//     }
+
+//     const currentUserIndex = updatedPlayers.findIndex(
+//       (player) => player.UserId === UserId
+//     );
+//     const nextUserIndex = (currentUserIndex + 1) % updatedPlayers.length;
+//     const nextUserId = updatedPlayers[nextUserIndex].UserId;
+//     const possibleValues = [1, 2, 3, 4, 5, 6];
+
+//     const randomIndex = Math.floor(Math.random() * possibleValues.length);
+
+//     const randomValue = possibleValues[randomIndex];
+
+//     // check for snakes, ladders and tunnel
+//     const currentPosition =
+//       updatedPlayers[currentUserIndex].points + randomValue;
+
+//     const snakeLadderAndTunnel = {
+//       4: 11, //--------------tunnel
+//       6: 41, //--------------ladder
+//       13: 7, //--------------snake
+//       14: 47, //--------------ladder
+//       22: 30, //--------------tunnel
+//       24: 16, //--------------snake
+//       25: 56, //--------------Ladder
+//       32: 61, //--------------Ladder
+//       36: 3, //--------------snake
+//       37: 49, //--------------tunnel
+//       45: 70, //--------------Ladder
+//       53: 76, //--------------Laadder
+//       60: 66, //--------------tunnel
+//       72: 48, //--------------snake
+//       79: 56, //--------------snake
+//       87: 68, //--------------snake
+//       95: 31, //--------------snake
+//     };
+//     if (currentPosition > 99) {
+//       updatedPlayers[currentUserIndex].dicePoints = randomValue;
+//       updatedPlayers[currentUserIndex].currentPoints = currentPosition;
+//       updatedPlayers[currentUserIndex].turn = false;
+//       updatedPlayers[currentUserIndex].turn = false;
+//       // updatedPlayers[nextUserIndex].turn = true;
+//       groupExist.updatedPlayers = updatedPlayers;
+//       // groupExist.lastHitTime = new Date();
+//       // groupExist.currentUserId = nextUserId;
+//       groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
+
+//       let updatedData = await groupExist.save();
+
+//       let updatedUser = updatedData.updatedPlayers[currentUserIndex];
+//       let result = {
+//         nextTurn: nextUserId,
+//         currentTime: new Date(),
+//         nextTurnTime: updatedData.nextTurnTime,
+//         currentPoints: currentPosition,
+//         dicePoints: randomValue,
+//         userName: updatedUser.userName,
+//         UserId: updatedUser.UserId,
+//         prize: updatedUser.prize,
+//         isBot: updatedUser.isBot,
+//         totalPoints: updatedUser.points,
+//         turn: updatedUser.turn,
+//       };
+//       console.log(result, "===========================");
+//       setTimeout(() => {
+//         groupExist.lastHitTime = new Date();
+//         groupExist.currentUserId = nextUserId;
+//         // groupExist.updatedPlayers[currentUserIndex].turn = false;
+//         groupExist.updatedPlayers[nextUserIndex].turn = true;
+//         //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
+//         groupExist.save();
+//         console.log(
+//           "after 8 sec in get >>>>>>>>>>",
+//           new Date().getSeconds(),
+//           groupExist
+//         );
+//       }, 2000);
+
+//       return res.status(200).json(result);
+//     }
+//     if (currentPosition in snakeLadderAndTunnel) {
+//       updatedPlayers[currentUserIndex].points =
+//         snakeLadderAndTunnel[currentPosition];
+//       updatedPlayers[currentUserIndex].movement =
+//         currentPosition === 6 ||
+//         currentPosition === 14 ||
+//         currentPosition === 25 ||
+//         currentPosition === 32 ||
+//         currentPosition === 45 ||
+//         currentPosition === 53
+//           ? "Ladder"
+//           : currentPosition === 4 ||
+//             currentPosition === 22 ||
+//             currentPosition === 37 ||
+//             currentPosition === 60
+//           ? "Tunnel"
+//           : "Snake";
+//     } else {
+//       updatedPlayers[currentUserIndex].points = currentPosition;
+//       updatedPlayers[currentUserIndex].movement = '';
+//     }
+
+//     updatedPlayers[currentUserIndex].dicePoints = randomValue;
+//     updatedPlayers[currentUserIndex].currentPoints = currentPosition;
+//     updatedPlayers[currentUserIndex].turn = false;
+//     // updatedPlayers[nextUserIndex].turn = true;
+//     groupExist.updatedPlayers = updatedPlayers;
+//     // groupExist.lastHitTime = new Date();
+//     // groupExist.currentUserId = nextUserId;
+//     groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
+
+//     let updatedData = await groupExist.save();
+//     let updatedUser = updatedData.updatedPlayers[currentUserIndex];
+//     if (
+//       currentPosition === 6 ||
+//       currentPosition === 14 ||
+//       currentPosition === 25 ||
+//       currentPosition === 32 ||
+//       currentPosition === 45 ||
+//       currentPosition === 53
+//     ) {
+//       let result = {
+//         nextTurn: nextUserId,
+//         currentTime: new Date(),
+//         nextTurnTime:updatedData.nextTurnTime,
+//         currentPoints: currentPosition,
+//         dicePoints: randomValue,
+//         userName: updatedUser.userName,
+//         UserId: updatedUser.UserId,
+//         prize: updatedUser.prize,
+//         isBot: updatedUser.isBot,
+//         totalPoints: updatedUser.points,
+//         turn: updatedUser.turn,
+//       };
+//       console.log(result, "==========================");
+
+//       setTimeout(() => {
+//         groupExist.lastHitTime = new Date();
+//         groupExist.currentUserId = nextUserId;
+//         //groupExist.updatedPlayers[currentUserIndex].turn = false;
+//         groupExist.updatedPlayers[nextUserIndex].turn = true;
+//         //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
+//         groupExist.save();
+//         console.log(
+//           "after 8 sec in get >>>>>>>>>>",
+//           new Date().getSeconds(),
+//           groupExist
+//         );
+//       }, 4000);
+//       return res.status(200).json(result);
+//     } else {
+//       let result = {
+//         nextTurn: nextUserId,
+//         currentTime: new Date(),
+//         nextTurnTime: updatedData.nextTurnTime,
+//         currentPoints: currentPosition,
+//         dicePoints: randomValue,
+//         userName: updatedUser.userName,
+//         UserId: updatedUser.UserId,
+//         prize: updatedUser.prize,
+//         isBot: updatedUser.isBot,
+//         totalPoints: updatedUser.points,
+//         turn: updatedUser.turn,
+//       };
+//       setTimeout(() => {
+//         groupExist.lastHitTime = new Date();
+//         groupExist.currentUserId = nextUserId;
+//        // groupExist.updatedPlayers[currentUserIndex].turn = false;
+//         groupExist.updatedPlayers[nextUserIndex].turn = true;
+//         //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
+//         groupExist.save();
+//         console.log(
+//           "after 8 sec in get >>>>>>>>>>",
+//           new Date().getSeconds(),
+//           groupExist
+//         );
+//       }, 2000);
+//       return res.status(200).json(result);
+//     }
+//   } catch (err) {
+//     return res.status(500).send({
+//       status: false,
+//       error: err.message,
+//     });
+//   }
+// };
+
 const updatePointOfUser = async function (req, res) {
   try {
     let UserId = req.query.UserId;
@@ -923,9 +1156,12 @@ const updatePointOfUser = async function (req, res) {
 
     const randomValue = possibleValues[randomIndex];
 
-    // check for snakes, ladders and tunnel
+    // check for snakes, ladders, and tunnels
     const currentPosition =
       updatedPlayers[currentUserIndex].points + randomValue;
+
+    // Ensure that the current position does not exceed 99
+    const newPosition = currentPosition > 99 ? 99 : currentPosition;
 
     const snakeLadderAndTunnel = {
       4: 11, //--------------tunnel
@@ -946,96 +1182,46 @@ const updatePointOfUser = async function (req, res) {
       87: 68, //--------------snake
       95: 31, //--------------snake
     };
-    if (currentPosition > 99) {
-      updatedPlayers[currentUserIndex].dicePoints = randomValue;
-      updatedPlayers[currentUserIndex].currentPoints = currentPosition;
-      updatedPlayers[currentUserIndex].turn = false;
-      updatedPlayers[currentUserIndex].turn = false;
-      // updatedPlayers[nextUserIndex].turn = true;
-      groupExist.updatedPlayers = updatedPlayers;
-      // groupExist.lastHitTime = new Date();
-      // groupExist.currentUserId = nextUserId;
-      groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
 
-      let updatedData = await groupExist.save();
-
-      let updatedUser = updatedData.updatedPlayers[currentUserIndex];
-      let result = {
-        nextTurn: nextUserId,
-        currentTime: new Date(),
-        nextTurnTime: updatedData.nextTurnTime,
-        currentPoints: currentPosition,
-        dicePoints: randomValue,
-        userName: updatedUser.userName,
-        UserId: updatedUser.UserId,
-        prize: updatedUser.prize,
-        isBot: updatedUser.isBot,
-        totalPoints: updatedUser.points,
-        turn: updatedUser.turn,
-      };
-      console.log(result, "===========================");
-      setTimeout(() => {
-        groupExist.lastHitTime = new Date();
-        groupExist.currentUserId = nextUserId;
-        // groupExist.updatedPlayers[currentUserIndex].turn = false;
-        groupExist.updatedPlayers[nextUserIndex].turn = true;
-        //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
-        groupExist.save();
-        console.log(
-          "after 8 sec in get >>>>>>>>>>",
-          new Date().getSeconds(),
-          groupExist
-        );
-      }, 2000);
-
-      return res.status(200).json(result);
-    }
-    if (currentPosition in snakeLadderAndTunnel) {
-      updatedPlayers[currentUserIndex].points =
-        snakeLadderAndTunnel[currentPosition];
-      updatedPlayers[currentUserIndex].movement =
-        currentPosition === 6 ||
-        currentPosition === 14 ||
-        currentPosition === 25 ||
-        currentPosition === 32 ||
-        currentPosition === 45 ||
-        currentPosition === 53
-          ? "Ladder"
-          : currentPosition === 4 ||
-            currentPosition === 22 ||
-            currentPosition === 37 ||
-            currentPosition === 60
-          ? "Tunnel"
-          : "Snake";
+    if (newPosition in snakeLadderAndTunnel) {
+      updatedPlayers[currentUserIndex].points = snakeLadderAndTunnel[newPosition];
+      updatedPlayers[currentUserIndex].movement = newPosition === 6 || newPosition === 14 || newPosition === 25 || newPosition === 32 || newPosition === 45 || newPosition === 53 ? "Ladder" : newPosition === 4 || newPosition === 22 || newPosition === 37 || newPosition === 60 ? "Tunnel" : "Snake";
     } else {
-      updatedPlayers[currentUserIndex].points = currentPosition;
+      updatedPlayers[currentUserIndex].points = newPosition;
       updatedPlayers[currentUserIndex].movement = '';
     }
 
     updatedPlayers[currentUserIndex].dicePoints = randomValue;
-    updatedPlayers[currentUserIndex].currentPoints = currentPosition;
+    updatedPlayers[currentUserIndex].currentPoints = newPosition;
     updatedPlayers[currentUserIndex].turn = false;
-    // updatedPlayers[nextUserIndex].turn = true;
+
     groupExist.updatedPlayers = updatedPlayers;
-    // groupExist.lastHitTime = new Date();
-    // groupExist.currentUserId = nextUserId;
     groupExist.nextTurnTime = new Date(Date.now() + 8 * 1000);
 
     let updatedData = await groupExist.save();
     let updatedUser = updatedData.updatedPlayers[currentUserIndex];
+
+    const nextTurnHandler = () => {
+      groupExist.lastHitTime = new Date();
+      groupExist.currentUserId = nextUserId;
+      groupExist.updatedPlayers[nextUserIndex].turn = true;
+      groupExist.save();
+      console.log("after 8 sec in get >>>>>>>>>>", new Date().getSeconds(), groupExist);
+    };
+
     if (
-      currentPosition === 6 ||
-      currentPosition === 14 ||
-      currentPosition === 25 ||
-      currentPosition === 32 ||
-      currentPosition === 45 ||
-      currentPosition === 53
+      newPosition === 6 ||
+      newPosition === 14 ||
+      newPosition === 25 ||
+      newPosition === 32 ||
+      newPosition === 45 ||
+      newPosition === 53
     ) {
       let result = {
         nextTurn: nextUserId,
         currentTime: new Date(),
-        nextTurnTime:updatedData.nextTurnTime,
-        currentPoints: currentPosition,
+        nextTurnTime: updatedData.nextTurnTime,
+        currentPoints: newPosition,
         dicePoints: randomValue,
         userName: updatedUser.userName,
         UserId: updatedUser.UserId,
@@ -1046,26 +1232,15 @@ const updatePointOfUser = async function (req, res) {
       };
       console.log(result, "==========================");
 
-      setTimeout(() => {
-        groupExist.lastHitTime = new Date();
-        groupExist.currentUserId = nextUserId;
-        //groupExist.updatedPlayers[currentUserIndex].turn = false;
-        groupExist.updatedPlayers[nextUserIndex].turn = true;
-        //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
-        groupExist.save();
-        console.log(
-          "after 8 sec in get >>>>>>>>>>",
-          new Date().getSeconds(),
-          groupExist
-        );
-      }, 4000);
+      setTimeout(nextTurnHandler, 4000);
+
       return res.status(200).json(result);
     } else {
       let result = {
         nextTurn: nextUserId,
         currentTime: new Date(),
         nextTurnTime: updatedData.nextTurnTime,
-        currentPoints: currentPosition,
+        currentPoints: newPosition,
         dicePoints: randomValue,
         userName: updatedUser.userName,
         UserId: updatedUser.UserId,
@@ -1074,19 +1249,9 @@ const updatePointOfUser = async function (req, res) {
         totalPoints: updatedUser.points,
         turn: updatedUser.turn,
       };
-      setTimeout(() => {
-        groupExist.lastHitTime = new Date();
-        groupExist.currentUserId = nextUserId;
-       // groupExist.updatedPlayers[currentUserIndex].turn = false;
-        groupExist.updatedPlayers[nextUserIndex].turn = true;
-        //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
-        groupExist.save();
-        console.log(
-          "after 8 sec in get >>>>>>>>>>",
-          new Date().getSeconds(),
-          groupExist
-        );
-      }, 2000);
+
+      setTimeout(nextTurnHandler, 2000);
+
       return res.status(200).json(result);
     }
   } catch (err) {
@@ -1096,6 +1261,7 @@ const updatePointOfUser = async function (req, res) {
     });
   }
 };
+
 
 //___________________micro api for getting players__________________
 
