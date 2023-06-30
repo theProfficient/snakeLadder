@@ -831,18 +831,32 @@ const getSnkByGroupId = async function (req, res) {
       // const cnrtPlayer = updatedPlayers.find(
       //   (players) => players.dicePoints !== 0
       // );
-      let result = {
-        currentTurn: crntPlayer.UserId,
-        currentTime: new Date(),
-        nextTurnTime: snakeLadder.nextTurnTime,
-        tableId: snakeLadder.tableId,
-        updatedPlayers: snakeLadder.updatedPlayers,
-        isGameOver: snakeLadder.isGameOver,
-        gameEndTime: snakeLadder.gameEndTime,
-      };
-      // console.log(result.updatedPlayers, "no condition satisfied");
-      console.log("dicepoints and position of player", result.updatedPlayers);
-      return res.status(200).json(result);
+      if (crntPlayer === undefined || crntPlayer === null) {
+        let result = {
+          currentTurn: "wait for the turn",
+          currentTime: new Date(),
+          nextTurnTime: snakeLadder.nextTurnTime,
+          tableId: snakeLadder.tableId,
+          updatedPlayers: snakeLadder.updatedPlayers,
+          isGameOver: snakeLadder.isGameOver,
+          gameEndTime: snakeLadder.gameEndTime,
+        };
+        console.log("Wait for the turn");
+        return res.status(200).json(result);
+      } else {
+        let result = {
+          currentTurn: crntPlayer.UserId,
+          currentTime: new Date(),
+          nextTurnTime: snakeLadder.nextTurnTime,
+          tableId: snakeLadder.tableId,
+          updatedPlayers: snakeLadder.updatedPlayers,
+          isGameOver: snakeLadder.isGameOver,
+          gameEndTime: snakeLadder.gameEndTime,
+        };
+        console.log("dicepoints and position of player", result.updatedPlayers);
+        return res.status(200).json(result);
+      }
+      
     }
   // } catch (err) {
   //   return res.status(500).send({
@@ -935,7 +949,8 @@ const updatePointOfUser = async function (req, res) {
     if (currentPosition > 99) {
       updatedPlayers[currentUserIndex].dicePoints = randomValue;
       updatedPlayers[currentUserIndex].currentPoints = currentPosition;
-      // updatedPlayers[currentUserIndex].turn = false;
+      updatedPlayers[currentUserIndex].turn = false;
+      updatedPlayers[currentUserIndex].turn = false;
       // updatedPlayers[nextUserIndex].turn = true;
       groupExist.updatedPlayers = updatedPlayers;
       // groupExist.lastHitTime = new Date();
@@ -962,7 +977,7 @@ const updatePointOfUser = async function (req, res) {
       setTimeout(() => {
         groupExist.lastHitTime = new Date();
         groupExist.currentUserId = nextUserId;
-        groupExist.updatedPlayers[currentUserIndex].turn = false;
+        // groupExist.updatedPlayers[currentUserIndex].turn = false;
         groupExist.updatedPlayers[nextUserIndex].turn = true;
         //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
         groupExist.save();
@@ -999,7 +1014,7 @@ const updatePointOfUser = async function (req, res) {
 
     updatedPlayers[currentUserIndex].dicePoints = randomValue;
     updatedPlayers[currentUserIndex].currentPoints = currentPosition;
-    // updatedPlayers[currentUserIndex].turn = false;
+    updatedPlayers[currentUserIndex].turn = false;
     // updatedPlayers[nextUserIndex].turn = true;
     groupExist.updatedPlayers = updatedPlayers;
     // groupExist.lastHitTime = new Date();
@@ -1034,7 +1049,7 @@ const updatePointOfUser = async function (req, res) {
       setTimeout(() => {
         groupExist.lastHitTime = new Date();
         groupExist.currentUserId = nextUserId;
-        groupExist.updatedPlayers[currentUserIndex].turn = false;
+        //groupExist.updatedPlayers[currentUserIndex].turn = false;
         groupExist.updatedPlayers[nextUserIndex].turn = true;
         //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
         groupExist.save();
@@ -1062,7 +1077,7 @@ const updatePointOfUser = async function (req, res) {
       setTimeout(() => {
         groupExist.lastHitTime = new Date();
         groupExist.currentUserId = nextUserId;
-        groupExist.updatedPlayers[currentUserIndex].turn = false;
+       // groupExist.updatedPlayers[currentUserIndex].turn = false;
         groupExist.updatedPlayers[nextUserIndex].turn = true;
         //groupExist.updatedPlayers[nextUserIndex].diceHitted = false;
         groupExist.save();
