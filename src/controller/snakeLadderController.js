@@ -285,7 +285,7 @@ const getAllSnak = async function (req, res) {
 //___________________________________________________update snakeLaddertournament_______________________________
 
 const updateSnakLdrTournaments = async function (req, res) {
-  try {
+  //try {
     let tableId = req.query.tableId;
     let UserId = req.query.UserId;
     let updateData = req.query;
@@ -423,17 +423,17 @@ const updateSnakLdrTournaments = async function (req, res) {
         balance: userHistory.credits,
       },
     });
-  } catch (err) {
-    return res.status(500).send({
-      status: false,
-      error: err.message,
-    });
-  }
+  // } catch (err) {
+  //   return res.status(500).send({
+  //     status: false,
+  //     error: err.message,
+  //   });
+  // }
 };
 
 //__________________________________get groups per players and tableId ____________________________________________
 const getGroupsByUser = async function (req, res) {
-  try {
+  // try {
     let tableId = req.query.tableId;
     let UserId = req.query.UserId;
 
@@ -496,18 +496,18 @@ const getGroupsByUser = async function (req, res) {
       groupId,
       usersNameInStr,
     });
-  } catch (err) {
-    return res.status(500).send({
-      status: false,
-      error: err.message,
-    });
-  }
+  // } catch (err) {
+  //   return res.status(500).send({
+  //     status: false,
+  //     error: err.message,
+  //   });
+  // }
 };
 
 //______________________________________get group by groupId_______________________________
 
 const getSnkByGroupId = async function (req, res) {
-  try {
+ // try {
     let groupId = req.query.groupId;
 
     if (!mongoose.Types.ObjectId.isValid(groupId)) {
@@ -844,12 +844,12 @@ const getSnkByGroupId = async function (req, res) {
       console.log("dicepoints and position of player", result.updatedPlayers);
       return res.status(200).json(result);
     }
-  } catch (err) {
-    return res.status(500).send({
-      status: false,
-      error: err.message,
-    });
-  }
+  // } catch (err) {
+  //   return res.status(500).send({
+  //     status: false,
+  //     error: err.message,
+  //   });
+  // }
 };
 
 //_____________________________________update points of user________________________________________
