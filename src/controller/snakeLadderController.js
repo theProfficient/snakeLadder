@@ -723,7 +723,7 @@ const getSnkByGroupId = async function (req, res) {
       //   return res.status(200).json(result);
       // }
       if (currentPosition > 99) {
-        currentPosition = 99;
+        currentPosition = snakeLadder.updatedPlayers[currentUserIndex].points;
       }
       
       
@@ -1161,7 +1161,7 @@ const updatePointOfUser = async function (req, res) {
       updatedPlayers[currentUserIndex].points + randomValue;
 
     // Ensure that the current position does not exceed 99
-    const newPosition = currentPosition > 99 ? 99 : currentPosition;
+    const newPosition = currentPosition > 99 ? updatedPlayers[currentUserIndex].points : currentPosition;
 
     const snakeLadderAndTunnel = {
       4: 11, //--------------tunnel
