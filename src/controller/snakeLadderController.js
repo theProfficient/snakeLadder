@@ -1077,7 +1077,7 @@ const updatePointOfUser = async function (req, res) {
       status: false,
       error: err.message,
     });
-  }git add
+  }
 };
 
 // const updatePointOfUser = async function (req, res) {
