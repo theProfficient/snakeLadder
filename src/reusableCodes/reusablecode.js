@@ -429,13 +429,14 @@ const timeSinceLastHit =
 }
 
 async function overTheGame(groupId,snakeLadder){
+  let createdTime = snakeLadder.createdTime;
   let timeDiff = Math.abs(createdTime.getMinutes() - new Date().getMinutes());
   let nxtPlayer = snakeLadder.updatedPlayers.find((players) => players.turn === true);
       let reachTheDestination = snakeLadder.updatedPlayers.find(
     (players) => players.points === 99
   );
 let stopInterval ;
-  if (timeDiff >= 4 || reachTheDestination) {
+
     if (timeDiff >= 4 || reachTheDestination) {
     let overTheGame = await snkTournamentModel.findByIdAndUpdate(
       { _id: tableId },
@@ -454,18 +455,9 @@ let stopInterval ;
       updatedPlayers[1].dicePoints = 0;
       let overGame = await groupModelForSnakeLadder.findByIdAndUpdate(
         { _id: groupId },
-        { $set: { updatedPlayers: updatedPlayers }, isGameOver: true },
+        { $set: { updatedPlayers: updatedPlayers }, isGameOver: true, isGameStart:2 },
         { new: true }
       );
-      let result = {
-        currentTurn: "game is over",
-        currentTime: new Date(),
-        nextTurnTime: new Date(),
-        tableId: snakeLadder.tableId,
-        updatedPlayers: overGame.updatedPlayers,
-        isGameOver: overGame.isGameOver,
-        gameEndTime: overGame.gameEndTime,
-      };
       console.log("dicepoints and position of player", result.updatedPlayers);
       // return res.status(200).json(result);
     }
@@ -513,6 +505,7 @@ let stopInterval ;
         $set: {
           updatedPlayers: playersUpdate,
           isGameOver: true,
+          isGameStart:2
         },
       },
       { new: true }
@@ -523,22 +516,12 @@ let stopInterval ;
     }
 
     // continue with the rest of the code here...
-
-    let result = {
-      currentTurn: "game is over",
-      currentTime: new Date(),
-      nextTurnTime: new Date(),
-      tableId: snakeLadder.tableId,
-      updatedPlayers: overGame.updatedPlayers,
-      isGameOver: overGame.isGameOver,
-      gameEndTime: overGame.gameEndTime,
-    };
     console.log(result.updatedPlayers, "when winner is declared");
     // return res.status(200).json(result);
+    clearInterval(stopInterval);
   }
-    clearInterval(stopInterval)
-  }
- stopInterval = setInterval(checkTurn(groupId,snakeLadder),8000)
+
+ stopInterval = setInterval(() => checkTurn(groupId,snakeLadder),8000)
 
 }
 
