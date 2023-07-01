@@ -565,73 +565,42 @@ const getSnkByGroupId = async function (req, res) {
     );
     console.log(overTheGame, "overTheGame==============");
     let entryFee = checkTable.entryFee;
-
-    if (updatedPlayers[0].points === updatedPlayers[1].points) {
-      updatedPlayers[0].prize = entryFee * 0.75;
-      updatedPlayers[0].turn = false;
-      updatedPlayers[0].dicePoints = 0;
-      updatedPlayers[1].prize = entryFee * 0.75;
-      updatedPlayers[1].turn = false;
-      updatedPlayers[1].dicePoints = 0;
-      let overGame = await groupModelForSnakeLadder.findByIdAndUpdate(
-        { _id: groupId },
-        {
-          $set: { updatedPlayers: updatedPlayers },
-          isGameOver: true,
-          isGameStart: 2,
-        },
-        { new: true }
-      );
-      let result = {
-        currentTurn: "game is over",
-        currentTime: new Date(),
-        nextTurnTime: new Date(),
-        tableId: snakeLadder.tableId,
-        updatedPlayers: overGame.updatedPlayers,
-        isGameOver: overGame.isGameOver,
-        isGameStart: overGame.isGameStart,
-        gameEndTime: overGame.gameEndTime,
-      };
-      console.log("dicepoints and position of player", result.updatedPlayers);
-      return res.status(200).json(result);
+  
+    // Find the player with the highest points (the potential winner)
+    let potentialWinner = updatedPlayers.reduce((prevPlayer, currentPlayer) => {
+      return prevPlayer.points > currentPlayer.points ? prevPlayer : currentPlayer;
+    });
+  
+    // Check if there is a tie (both players have equal points)
+    let isTie = updatedPlayers.every((player) => player.points === potentialWinner.points);
+  
+    if (isTie) {
+      // Both players are winners with a prize of 0.5
+      updatedPlayers.forEach((player) => {
+        player.prize = entryFee * 0.5;
+        player.turn = false;
+        player.dicePoints = 0;
+      });
+    } else {
+      // Calculate the prize for the potential winner and the runner-up
+      potentialWinner.prize = entryFee * 1.5;
+      let runner = updatedPlayers.find((player) => player.UserId !== potentialWinner.UserId);
+      runner.prize = entryFee * 0;
+  
+      // Set the turn and dicePoints to 0 for both players
+      potentialWinner.turn = false;
+      potentialWinner.dicePoints = 0;
+      runner.turn = false;
+      runner.dicePoints = 0;
     }
-
-    let winner =
-      updatedPlayers[0].points < updatedPlayers[1].points
-        ? updatedPlayers[1]
-        : updatedPlayers[0];
-
-    let winnerId = winner.UserId;
-    winner.prize = entryFee * 1.5;
-    let runner = updatedPlayers.find((players) => players.UserId !== winnerId);
-    // winner.turn = false;
-    // runner.turn = false;
-
-    let playersUpdate = [
-      {
-        UserId: winner.UserId,
-        userName: winner.userName,
-        prize: winner.prize,
-        isBot: winner.isBot,
-        points: winner.points,
-        turn: false,
-        dicePoints: 0,
-      },
-      {
-        UserId: runner.UserId,
-        userName: runner.userName,
-        prize: runner.prize,
-        isBot: runner.isBot,
-        points: runner.points,
-        turn: false,
-        dicePoints: 0,
-      },
-    ];
-
+  
+    // Update the players array with the updated winner(s) and runner-up
+    let playersUpdate = updatedPlayers;
+  
     let overGame = await groupModelForSnakeLadder.findOneAndUpdate(
       {
         _id: groupId,
-        "updatedPlayers.UserId": { $in: [winnerId, runner.UserId] },
+        "updatedPlayers.UserId": { $in: updatedPlayers.map((player) => player.UserId) },
       },
       {
         $set: {
@@ -642,13 +611,13 @@ const getSnkByGroupId = async function (req, res) {
       },
       { new: true }
     );
-
+  
     if (!overGame) {
       return { status: false, error: "Game not found" };
     }
-
+  
     // continue with the rest of the code here...
-
+  
     let result = {
       currentTurn: "game is over",
       currentTime: new Date(),
@@ -662,6 +631,7 @@ const getSnkByGroupId = async function (req, res) {
     console.log(result.updatedPlayers, "when winner is declared");
     return res.status(200).json(result);
   }
+  
 
   //_________________update points for bot User________________________________
 

@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema(
     },
     credits: {
       type: Number,
-      default: 100,
+      default: 10000,
     },
     isBot: {
       type: Boolean,
