@@ -566,7 +566,7 @@ const getSnkByGroupId = async function (req, res) {
         updatedPlayers[1].dicePoints = 0;
         let overGame = await groupModelForSnakeLadder.findByIdAndUpdate(
           { _id: groupId },
-          { $set: { updatedPlayers: updatedPlayers }, isGameOver: true },
+          { $set: { updatedPlayers: updatedPlayers }, isGameOver: true,isGameStart:2 },
           { new: true }
         );
         let result = {
@@ -576,6 +576,7 @@ const getSnkByGroupId = async function (req, res) {
           tableId: snakeLadder.tableId,
           updatedPlayers: overGame.updatedPlayers,
           isGameOver: overGame.isGameOver,
+          isGameStart:overGame.isGameStart,
           gameEndTime: overGame.gameEndTime,
         };
         console.log("dicepoints and position of player", result.updatedPlayers);
@@ -625,6 +626,7 @@ const getSnkByGroupId = async function (req, res) {
           $set: {
             updatedPlayers: playersUpdate,
             isGameOver: true,
+            isGameStart:2
           },
         },
         { new: true }
@@ -643,6 +645,7 @@ const getSnkByGroupId = async function (req, res) {
         tableId: snakeLadder.tableId,
         updatedPlayers: overGame.updatedPlayers,
         isGameOver: overGame.isGameOver,
+        isGameStart:overGame.isGameStart,
         gameEndTime: overGame.gameEndTime,
       };
       console.log(result.updatedPlayers, "when winner is declared");
@@ -780,6 +783,7 @@ const getSnkByGroupId = async function (req, res) {
             tableId: snakeLadder.tableId,
             updatedPlayers: updatedData.updatedPlayers,
             isGameOver: snakeLadder.isGameOver,
+            isGameStart:updatedData.isGameStart,
             gameEndTime: snakeLadder.gameEndTime,
           };
           
@@ -827,6 +831,7 @@ const getSnkByGroupId = async function (req, res) {
         tableId: updateTurn.tableId,
         updatedPlayers: updateTurn.updatedPlayers,
         isGameOver: updateTurn.isGameOver,
+        isGameStart:updateTurn.isGameStart,
         gameEndTime: updateTurn.gameEndTime,
       };
       return res.status(200).json(result);
@@ -843,6 +848,7 @@ const getSnkByGroupId = async function (req, res) {
           tableId: snakeLadder.tableId,
           updatedPlayers: snakeLadder.updatedPlayers,
           isGameOver: snakeLadder.isGameOver,
+          isGameStart:snakeLadder.isGameStart,
           gameEndTime: snakeLadder.gameEndTime,
         };
         console.log("Wait for the turn");
@@ -855,6 +861,7 @@ const getSnkByGroupId = async function (req, res) {
           tableId: snakeLadder.tableId,
           updatedPlayers: snakeLadder.updatedPlayers,
           isGameOver: snakeLadder.isGameOver,
+          isGameStart:snakeLadder.isGameStart,
           gameEndTime: snakeLadder.gameEndTime,
         };
         console.log("dicepoints and position of player", result.updatedPlayers);

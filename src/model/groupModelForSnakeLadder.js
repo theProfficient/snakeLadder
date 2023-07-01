@@ -66,6 +66,10 @@ const SnakeLadderGroupSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isGameStart: {
+      type: Number,
+      default: 0,
+    },
     gameEndTime: {
       type: Date,
     },

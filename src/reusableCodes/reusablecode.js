@@ -251,9 +251,9 @@ const createGroupForSnakeLadder = async function (tableId) {
           let grpId = createGrp._id;
           let group = createGrp.group;
           console.log(createGrp);
-          setTimeout(function () {
+          // setTimeout(function () {
           startMatchForSnkLdr(grpId, group);
-           }, 5000);
+          //  }, 5000);
         }
       }
     }
@@ -278,21 +278,21 @@ async function startMatchForSnkLdr(grpId, group) {
     console.log("result", result);
     const matchData = await groupModelForSnakeLadder.findOneAndUpdate(
       { _id: grpId },
-      { updatedPlayers: result, $set: { gameEndTime:Date.now() + 4 * 60 * 1000} },
+      { updatedPlayers: result, $set: {start: true, gameEndTime:Date.now() + 4 * 60 * 1000} },
       { new: true, setDefaultsOnInsert: true }
     );
     console.log("this is updated data >>>>>>>>>>", matchData);
-    //setTimeout(async function () {
+    setTimeout(async function () {
     let updatedPlayers = matchData.updatedPlayers;
     let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
     matchData.updatedPlayers[currentPlayerIndex].turn = true;
-    matchData.start = true;
     matchData.lastHitTime = new Date();
+    matchData.isGameStart = 1 ;
     matchData.currentUserId = updatedPlayers[currentPlayerIndex].UserId;
     // const updatedGroupFst = await matchData.save();
       const updatedGroupFst = await matchData.save();
       // Rest of your code here...
-    //}, 2000);
+    }, 3000);
     //  overTheGame(grpId,updatedGroupFst)
   }
 }
