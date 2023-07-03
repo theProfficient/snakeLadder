@@ -1,2 +1,12 @@
-[config]
+ [
+    {
+      "name": "WEBSITE_NODE_DEFAULT_VERSION",
+      "value": "xx"
+    },
+    {
+      "name": "APP_SCRIPT_FILE",
+      "value": "/home/site/wwwroot/src/index.js" // Update this path
+    }
+  ]
+  
 SCM_DO_BUILD_DURING_DEPLOYMENT=true
