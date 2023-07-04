@@ -524,7 +524,8 @@ const getSnkByGroupId = async function (req, res) {
   let tableId = snakeLadder.tableId;
   let createdTime = snakeLadder.createdTime;
   const updatedPlayers = snakeLadder.updatedPlayers;
-  let timeDiff = Math.abs(createdTime.getMinutes() - new Date().getMinutes());
+  let timeDiff = snakeLadder.gameEndTime.getMinutes() - new Date().getMinutes();
+  console.log(timeDiff,"endtime of a group==========")
   let crntPlayer = updatedPlayers.find((players) => players.turn === true);
   // const cnrtPlayer = updatedPlayers.find(
   //   (players) => players.dicePoints !== 0
@@ -557,7 +558,7 @@ const getSnkByGroupId = async function (req, res) {
     (players) => players.points === 99
   );
 
-  if (timeDiff >= 4 || reachTheDestination) {
+  if (timeDiff <= 0 || reachTheDestination) {
     let overTheGame = await snkTournamentModel.findByIdAndUpdate(
       { _id: tableId },
       { isGameOverForTable: true },
