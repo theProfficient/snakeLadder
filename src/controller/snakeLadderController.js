@@ -524,7 +524,7 @@ const getSnkByGroupId = async function (req, res) {
   let tableId = snakeLadder.tableId;
   let createdTime = snakeLadder.createdTime;
   const updatedPlayers = snakeLadder.updatedPlayers;
-  let timeDiff = snakeLadder.gameEndTime.getMinutes() - new Date().getMinutes();
+  let timeDiff = snakeLadder.gameEndTime - new Date();
   console.log(timeDiff,"endtime of a group==========")
   let crntPlayer = updatedPlayers.find((players) => players.turn === true);
   // const cnrtPlayer = updatedPlayers.find(
