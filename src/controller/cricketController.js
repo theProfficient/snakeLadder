@@ -55,96 +55,111 @@ const getCricByGroupId = async function (req, res) {
          message: "this table is not present in DB",
        });
      }
-     let ballCount = cricket.ball
-     if(ballCount === 0 && isWicketUpdated === false){
-      // let  updatedPlayers = cricket.updatedPlayers.map((players)=> {
-      //   if (!players.hit && players.isBot === false) {
-      //     //___________If the player did not hit the ball, set the wicket to true
-      //     players.wicket += 1;
-      //     players.isWicketUpdated = true
-      //   }
-      //   return players;
-      // });
+    // let ballCount = cricket.ball
+  //    if(ballCount === 0 && isWicketUpdated === false){
+  //     // let  updatedPlayers = cricket.updatedPlayers.map((players)=> {
+  //     //   if (!players.hit && players.isBot === false) {
+  //     //     //___________If the player did not hit the ball, set the wicket to true
+  //     //     players.wicket += 1;
+  //     //     players.isWicketUpdated = true
+  //     //   }
+  //     //   return players;
+  //     // });
 
-      // await groupModel.updateOne({ _id: groupId }, { $set: { updatedPlayers } });
+  //     // await groupModel.updateOne({ _id: groupId }, { $set: { updatedPlayers } });
    
 
-    let players = cricket.updatedPlayers.sort((a,b) => {
-      if(b.run !== a.run){
-        return b.run - a.run; //__sort by runs in descending order
-      }else{
-        return a.wicket - b.wicket; //___sort by wickets in ascending order for players with the same runs
-      }
-     })
-     console.log(players,"declareWinners_______________");
+  //   let players = cricket.updatedPlayers.sort((a,b) => {
+  //     if(b.run !== a.run){
+  //       return b.run - a.run; //__sort by runs in descending order
+  //     }else{
+  //       return a.wicket - b.wicket; //___sort by wickets in ascending order for players with the same runs
+  //     }
+  //    })
+  //    console.log(players,"declareWinners_______________");
 
-    //merging code of sort and map function
+  //   //merging code of sort and map function
 
-    // let players = cricket.updatedPlayers.map((player) => {
-    //   if (!player.hit && player.isBot === false && isWicketUpdated === false) {
-    //     player.wicket += 1; // If the player did not hit the ball, set the wicket to true
-    //     player.isWicketUpdated = true;
-    //   }
-    //   return player;
-    // }).sort((a, b) => {
-    //   if (b.run !== a.run) {
-    //     return b.run - a.run; // Sort by runs in descending order
-    //   } else {
-    //     return a.wicket - b.wicket; // Sort by wickets in ascending order for players with the same runs
-    //   }
-    // });
+  //   // let players = cricket.updatedPlayers.map((player) => {
+  //   //   if (!player.hit && player.isBot === false && isWicketUpdated === false) {
+  //   //     player.wicket += 1; // If the player did not hit the ball, set the wicket to true
+  //   //     player.isWicketUpdated = true;
+  //   //   }
+  //   //   return player;
+  //   // }).sort((a, b) => {
+  //   //   if (b.run !== a.run) {
+  //   //     return b.run - a.run; // Sort by runs in descending order
+  //   //   } else {
+  //   //     return a.wicket - b.wicket; // Sort by wickets in ascending order for players with the same runs
+  //   //   }
+  //   // });
     
-    // console.log(players, "declareWinners_______________");
+  //   // console.log(players, "declareWinners_______________");
     
 
-    //_________________winner prize as per prize amount
+  //   //_________________winner prize as per prize amount
       
-    const prizes = checkTable.prizeAmount;
-    players[0].prize = prizes * 0.35;
-    players[1].prize = prizes * 0.25;
-    players[2].prize = prizes * 0.15;
-    players[3].prize = prizes * 0.05;
+  //   const prizes = checkTable.prizeAmount;
+  //   players[0].prize = prizes * 0.35;
+  //   players[1].prize = prizes * 0.25;
+  //   players[2].prize = prizes * 0.15;
+  //   players[3].prize = prizes * 0.05;
 
-    const result = await groupModel.findByIdAndUpdate(
-      {_id:groupId},
-      {$set:{updatedPlayers:players},
-      isWicketUpdated :true},
-      {new:true}
-    )
-    let users = result.updatedPlayers;
-    let tableId = result.tableId ;
-    //  let prizes = result.updatedPlayers;
+  //   const result = await groupModel.findByIdAndUpdate(
+  //     {_id:groupId},
+  //     {$set:{updatedPlayers:players},
+  //     isWicketUpdated :true},
+  //     {new:true}
+  //   )
+  //   let users = result.updatedPlayers;
+  //   let tableId = result.tableId ;
+  //   //  let prizes = result.updatedPlayers;
     
-    // Create an array of update operations to update the balance of each user
-    let userBulkUpdates = users.map((player) => ({
-      updateOne: {
-        filter: { UserId: player.UserId },
-        update: { $inc: { realMoney: player.prize } },
-        new: true
-      }
-    }));
+  //   // Create an array of update operations to update the balance of each user
+  //   let userBulkUpdates = users.map((player) => ({
+  //     updateOne: {
+  //       filter: { UserId: player.UserId },
+  //       update: { $inc: { realMoney: player.prize } },
+  //       new: true
+  //     }
+  //   }));
     
-    // Execute the update operations in a single database call by bulkWrite() method
-    const updatedBalance = await userModel.bulkWrite(userBulkUpdates);
+  //   // Execute the update operations in a single database call by bulkWrite() method
+  //   const updatedBalance = await userModel.bulkWrite(userBulkUpdates);
     
-    //________________________update table
+  //   //________________________update table
 
-    //  let updateTable = await tournamentModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
-    let resForWinners = {
-      _id: result._id,
-      createdTime: result.createdTime,
-      tableId: result.tableId,
-      updatedPlayers: result.updatedPlayers,
-      ball: result.ball,
-      start: result.start,
-      currentBallTime: new Date(),
-      nextBallTime: result.nextBallTime,
-      ballSpeed: result.ballSpeed,
-    };
+  //   //  let updateTable = await tournamentModel.findByIdAndUpdate({_id:tableId},{isMatchOverForTable:true},{new:true});
+  //   let resForWinners = {
+  //     _id: result._id,
+  //     createdTime: result.createdTime,
+  //     tableId: result.tableId,
+  //     updatedPlayers: result.updatedPlayers,
+  //     ball: result.ball,
+  //     start: result.start,
+  //     currentBallTime: new Date(),
+  //     nextBallTime: result.nextBallTime,
+  //     ballSpeed: result.ballSpeed,
+  //   };
     
-    return res.status(200).json(resForWinners);
-  }
-    
+  //   return res.status(200).json(resForWinners);
+  // }
+    if(cricket.isMatchOver === true){
+      let resForWinners = {
+            _id: cricket._id,
+            createdTime: cricket.createdTime,
+            tableId: cricket.tableId,
+            updatedPlayers: cricket.updatedPlayers,
+            ball: cricket.ball,
+            start: cricket.start,
+            currentBallTime: new Date(),
+            nextBallTime: cricket.nextBallTime,
+            ballSpeed: cricket.ballSpeed,
+          };
+          
+          return res.status(200).json(resForWinners);
+
+    }
     if (cricket.updatedPlayers.length !== 0) {
       let cricket1 = {
         _id: cricket._id,

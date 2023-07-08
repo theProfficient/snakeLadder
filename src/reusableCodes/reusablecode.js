@@ -118,6 +118,68 @@ async function updateBalls(grpId) {
 
       await groupModel.updateOne({ _id: grpId }, { $set: { updatedPlayers } });
     }
+    if (ballCountForWicket === 0) {
+      // let endTheMatch = await groupModel.findByIdAndUpdate(
+      //   { _id: grpId },
+      //   {
+      //     isMatchOver: true,
+      //   },
+      //   { new: true }
+      // );
+      let updateTable = await tournamentModel.findByIdAndUpdate(
+        { _id: tableId },
+        { isMatchOverForTable: true },
+        { new: true }
+      );
+      if (!updateTable) {
+        return result
+          .status(404)
+          .send({
+            status: false,
+            message: "table is not updated for isMatchOverForTable to true ",
+          });
+      }
+      let players = updateWicket.updatedPlayers.sort((a, b) => {
+        if (b.run !== a.run) {
+          return b.run - a.run; //__sort by runs in descending order
+        } else {
+          return a.wicket - b.wicket; //___sort by wickets in ascending order for players with the same runs
+        }
+      });
+      console.log(players, "declareWinners_______________");
+      //_________________winner prize as per prize amount
+
+      const prizes = updateTable.prizeAmount;
+      players[0].prize = prizes * 0.35;
+      players[1].prize = prizes * 0.25;
+      players[2].prize = prizes * 0.15;
+      players[3].prize = prizes * 0.05;
+
+      const result = await groupModel.findByIdAndUpdate(
+        { _id: grpId },
+        {
+          $set: { updatedPlayers: players },
+          isWicketUpdated: true,
+          isMatchOver: true,
+          ball: 0,
+        },
+        { new: true }
+      );
+      let users = result.updatedPlayers;
+      //  let prizes = result.updatedPlayers;
+
+      // Create an array of update operations to update the balance of each user
+      let userBulkUpdates = users.map((player) => ({
+        updateOne: {
+          filter: { UserId: player.UserId },
+          update: { $inc: { realMoney: player.prize } },
+          new: true,
+        },
+      }));
+
+      // Execute the update operations in a single database call by bulkWrite() method
+      const updatedBalance = await userModel.bulkWrite(userBulkUpdates);
+    }
     let ballCount;
     if (ballCountForWicket > 0) {
       let updateBall = await groupModel.findByIdAndUpdate(
@@ -165,21 +227,70 @@ async function updateBalls(grpId) {
       );
     }
 
-    if (ballCount === 0) {
-      let endTheMatch = await groupModel.findByIdAndUpdate(
-        { _id: grpId },
-        {
-          isMatchOver: true,
-        },
-        { new: true }
-      );
-      let updateTable = await tournamentModel.findByIdAndUpdate(
-        { _id: tableId },
-        { isMatchOverForTable: true },
-        { new: true }
-      );
-    }
-    if (ballCountForWicket <= min - 1) {
+    // if (ballCount === -1) {
+    //   // let endTheMatch = await groupModel.findByIdAndUpdate(
+    //   //   { _id: grpId },
+    //   //   {
+    //   //     isMatchOver: true,
+    //   //   },
+    //   //   { new: true }
+    //   // );
+    //   let updateTable = await tournamentModel.findByIdAndUpdate(
+    //     { _id: tableId },
+    //     { isMatchOverForTable: true },
+    //     { new: true }
+    //   );
+    //   if (!updateTable) {
+    //     return result
+    //       .status(404)
+    //       .send({
+    //         status: false,
+    //         message: "table is not updated for isMatchOverForTable to true ",
+    //       });
+    //   }
+    //   let players = updateWicket.updatedPlayers.sort((a, b) => {
+    //     if (b.run !== a.run) {
+    //       return b.run - a.run; //__sort by runs in descending order
+    //     } else {
+    //       return a.wicket - b.wicket; //___sort by wickets in ascending order for players with the same runs
+    //     }
+    //   });
+    //   console.log(players, "declareWinners_______________");
+    //   //_________________winner prize as per prize amount
+
+    //   const prizes = updateTable.prizeAmount;
+    //   players[0].prize = prizes * 0.35;
+    //   players[1].prize = prizes * 0.25;
+    //   players[2].prize = prizes * 0.15;
+    //   players[3].prize = prizes * 0.05;
+
+    //   const result = await groupModel.findByIdAndUpdate(
+    //     { _id: grpId },
+    //     {
+    //       $set: { updatedPlayers: players },
+    //       isWicketUpdated: true,
+    //       isMatchOver: true,
+    //       ball: 0,
+    //     },
+    //     { new: true }
+    //   );
+    //   let users = result.updatedPlayers;
+    //   //  let prizes = result.updatedPlayers;
+
+    //   // Create an array of update operations to update the balance of each user
+    //   let userBulkUpdates = users.map((player) => ({
+    //     updateOne: {
+    //       filter: { UserId: player.UserId },
+    //       update: { $inc: { realMoney: player.prize } },
+    //       new: true,
+    //     },
+    //   }));
+
+    //   // Execute the update operations in a single database call by bulkWrite() method
+    //   const updatedBalance = await userModel.bulkWrite(userBulkUpdates);
+    // }
+
+    if (ballCountForWicket <= min - 1 ) {
       console.log("Reached minimum ball count!");
       return true;
     }
@@ -191,11 +302,13 @@ function runUpdateBalls(grpId) {
   console.log("call the runUpdateBalls function >>>>>>>>>>>", grpId);
   if (grpId != undefined) {
     let continueRunning = true;
+    let executionCount = 0;
 
     async function updateBallsRecursive() {
       if (continueRunning) {
         const isMaxCountReached = await updateBalls(grpId);
-        if (!isMaxCountReached) {
+        if (!isMaxCountReached && executionCount < 7) {
+          executionCount++;
           setTimeout(async () => {
             //________________update nextBallTime, currentBallTime and  ballSpeed in every 4 seconds
             updateBallsRecursive();
@@ -272,28 +385,41 @@ async function startMatchForSnkLdr(grpId, group) {
       turn: name.turn,
       dicePoints: 0,
       currentPoints: 0,
-      movement: ''
+      movement: "",
     }));
     console.log("result", result);
     const matchData = await groupModelForSnakeLadder.findOneAndUpdate(
       { _id: grpId },
-      { updatedPlayers: result, $set: { start: true, gameEndTime: Date.now() + 3 * 60 * 1000 } },
+      {
+        updatedPlayers: result,
+        $set: { start: true, gameEndTime: Date.now() + 3 * 60 * 1000 },
+      },
       { new: true, setDefaultsOnInsert: true }
     );
 
-    console.log(new Date().getSeconds(), "====before 6 sec of starting the game==============", matchData.isGameStart);
+    console.log(
+      new Date().getSeconds(),
+      "====before 6 sec of starting the game==============",
+      matchData.isGameStart
+    );
 
     await new Promise((resolve) => {
       setTimeout(async function () {
         let updatedPlayers = matchData.updatedPlayers;
-        let currentPlayerIndex = Math.floor(Math.random() * updatedPlayers.length);
+        let currentPlayerIndex = Math.floor(
+          Math.random() * updatedPlayers.length
+        );
         matchData.updatedPlayers[currentPlayerIndex].turn = true;
         matchData.lastHitTime = new Date();
         matchData.isGameStart = 1;
         matchData.currentUserId = updatedPlayers[currentPlayerIndex].UserId;
 
         const updatedGroupFst = await matchData.save();
-        console.log(new Date().getSeconds(), "=====after 6 sec of starting the game===========", updatedGroupFst.isGameStart);
+        console.log(
+          new Date().getSeconds(),
+          "=====after 6 sec of starting the game===========",
+          updatedGroupFst.isGameStart
+        );
 
         resolve(); // Resolve the promise to continue with the rest of the code
       }, 6000);
@@ -303,15 +429,13 @@ async function startMatchForSnkLdr(grpId, group) {
   }
 }
 
-async function checkTurn(groupId,snakeLadder){ 
+async function checkTurn(groupId, snakeLadder) {
   let tableId = snakeLadder.tableId;
   let createdTime = snakeLadder.createdTime;
   const updatedPlayers = snakeLadder.updatedPlayers;
- // let timeDiff = Math.abs(createdTime.getMinutes() - new Date().getMinutes());
+  // let timeDiff = Math.abs(createdTime.getMinutes() - new Date().getMinutes());
   let nxtPlayer = updatedPlayers.find((players) => players.turn === true);
-let botPlayer = updatedPlayers.find(
-    (player) => player.isBot && player.turn
-  );
+  let botPlayer = updatedPlayers.find((player) => player.isBot && player.turn);
 
   if (botPlayer) {
     let botPlayerId = botPlayer.UserId;
@@ -352,51 +476,56 @@ let botPlayer = updatedPlayers.find(
     if (currentPosition > 99) {
       currentPosition = snakeLadder.updatedPlayers[currentUserIndex].points;
     }
-    
+
     if (currentPosition in snakeLadderAndTunnel) {
       // Update position based on snakes, ladders, and tunnels
       snakeLadder.updatedPlayers[currentUserIndex].points =
-      snakeLadderAndTunnel[currentPosition];
+        snakeLadderAndTunnel[currentPosition];
       snakeLadder.updatedPlayers[currentUserIndex].movement =
-      currentPosition === 6 ||
-      currentPosition === 14 ||
-      currentPosition === 25 ||
-      currentPosition === 32 ||
-      currentPosition === 45 ||
-      currentPosition === 53
-      ? "Ladder"
-      : currentPosition === 4 ||
-      currentPosition === 22 ||
-      currentPosition === 37 ||
-      currentPosition === 60
-      ? "Tunnel"
-      : "Snake";
+        currentPosition === 6 ||
+        currentPosition === 14 ||
+        currentPosition === 25 ||
+        currentPosition === 32 ||
+        currentPosition === 45 ||
+        currentPosition === 53
+          ? "Ladder"
+          : currentPosition === 4 ||
+            currentPosition === 22 ||
+            currentPosition === 37 ||
+            currentPosition === 60
+          ? "Tunnel"
+          : "Snake";
     } else {
       snakeLadder.updatedPlayers[currentUserIndex].points = currentPosition;
-      snakeLadder.updatedPlayers[currentUserIndex].movement = '';
+      snakeLadder.updatedPlayers[currentUserIndex].movement = "";
     }
-    
+
     snakeLadder.updatedPlayers[currentUserIndex].dicePoints = randomValue;
     snakeLadder.updatedPlayers[nextUserIndex].dicePoints = 0;
     snakeLadder.updatedPlayers[currentUserIndex].currentPoints =
-    currentPosition;
+      currentPosition;
     snakeLadder.currentUserId = nextUserId;
     snakeLadder.updatedPlayers[currentUserIndex].turn = false;
     snakeLadder.updatedPlayers[nextUserIndex].turn = true;
     snakeLadder.nextTurnTime = new Date(Date.now() + 8 * 1000);
     snakeLadder.lastHitTime = new Date();
-    console.log(snakeLadder.nextTurnTime.getSeconds(),"sec befor db call=============")
+    console.log(
+      snakeLadder.nextTurnTime.getSeconds(),
+      "sec befor db call============="
+    );
     let updatedData = await groupModelForSnakeLadder.findOneAndUpdate(
       { _id: groupId },
       {
         $set: snakeLadder,
       },
       { new: true }
-      );
-      console.log(updatedData.nextTurnTime.getSeconds(),"sec after db call========")
-      
+    );
+    console.log(
+      updatedData.nextTurnTime.getSeconds(),
+      "sec after db call========"
+    );
   }
-const timeSinceLastHit =
+  const timeSinceLastHit =
     Math.abs(snakeLadder.lastHitTime.getTime() - new Date().getTime()) / 1000;
   if (timeSinceLastHit >= 8) {
     //__________Switch turn to next user
@@ -428,16 +557,18 @@ const timeSinceLastHit =
   }
 }
 
-async function overTheGame(groupId,snakeLadder){
+async function overTheGame(groupId, snakeLadder) {
   let createdTime = snakeLadder.createdTime;
   let timeDiff = Math.abs(createdTime.getMinutes() - new Date().getMinutes());
-  let nxtPlayer = snakeLadder.updatedPlayers.find((players) => players.turn === true);
-      let reachTheDestination = snakeLadder.updatedPlayers.find(
+  let nxtPlayer = snakeLadder.updatedPlayers.find(
+    (players) => players.turn === true
+  );
+  let reachTheDestination = snakeLadder.updatedPlayers.find(
     (players) => players.points === 99
   );
-let stopInterval ;
+  let stopInterval;
 
-    if (timeDiff >= 4 || reachTheDestination) {
+  if (timeDiff >= 4 || reachTheDestination) {
     let overTheGame = await snkTournamentModel.findByIdAndUpdate(
       { _id: tableId },
       { isGameOverForTable: true },
@@ -455,7 +586,11 @@ let stopInterval ;
       updatedPlayers[1].dicePoints = 0;
       let overGame = await groupModelForSnakeLadder.findByIdAndUpdate(
         { _id: groupId },
-        { $set: { updatedPlayers: updatedPlayers }, isGameOver: true, isGameStart:2 },
+        {
+          $set: { updatedPlayers: updatedPlayers },
+          isGameOver: true,
+          isGameStart: 2,
+        },
         { new: true }
       );
       console.log("dicepoints and position of player", result.updatedPlayers);
@@ -469,9 +604,7 @@ let stopInterval ;
 
     let winnerId = winner.UserId;
     winner.prize = entryFee * 1.5;
-    let runner = updatedPlayers.find(
-      (players) => players.UserId !== winnerId
-    );
+    let runner = updatedPlayers.find((players) => players.UserId !== winnerId);
     // winner.turn = false;
     // runner.turn = false;
 
@@ -505,7 +638,7 @@ let stopInterval ;
         $set: {
           updatedPlayers: playersUpdate,
           isGameOver: true,
-          isGameStart:2
+          isGameStart: 2,
         },
       },
       { new: true }
@@ -521,8 +654,7 @@ let stopInterval ;
     clearInterval(stopInterval);
   }
 
- stopInterval = setInterval(() => checkTurn(groupId,snakeLadder),8000)
-
+  stopInterval = setInterval(() => checkTurn(groupId, snakeLadder), 8000);
 }
 
 module.exports = {
