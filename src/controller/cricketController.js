@@ -36,7 +36,7 @@ const getAllCric = async function (req, res) {
 // _______________________get cricket group by id data
 
 const getCricByGroupId = async function (req, res) {
-  try {
+  //try {
     let groupId = req.query.groupId;
 
     let cricket = await groupModel.findById({ _id: groupId });
@@ -176,12 +176,12 @@ const getCricByGroupId = async function (req, res) {
       
     }
     return res.status(200).json(cricket);
-  } catch (err) {
-    return res.status(500).send({
-      status: false,
-      error: err.message,
-    });
-  }
+  // } catch (err) {
+  //   return res.status(500).send({
+  //     status: false,
+  //     error: err.message,
+  //   });
+  // }
 };
 
 
@@ -189,7 +189,7 @@ const getCricByGroupId = async function (req, res) {
 //____________________________update table__________________________
 
 const updateCric = async function (req, res) {
-  try {
+  //try {
     let updateData = req.query;
     let UserId = req.query.UserId;
     let groupId = req.query.groupId;
@@ -379,9 +379,9 @@ const updateCric = async function (req, res) {
       return res.status(200).json(response);
     }
     // }
-  } catch (err) {
-    return res.status(500).send;
-  }
+  // } catch (err) {
+  //   return res.status(500).send({status:false,message:err.message})
+  // }
 };
 
 //__________________________declare the winner_______________________________(not used in this project)
