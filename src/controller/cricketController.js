@@ -160,7 +160,7 @@ const getCricByGroupId = async function (req, res) {
     return res.status(200).json(resForWinners);   
   }
 
-  if(cricket.nextBallTime - new Date() >= 0){
+  if(cricket.nextBallTime - new Date() > 0){
     if (cricket.updatedPlayers.length !== 0) {
       let cricket1 = {
         _id: cricket._id,
@@ -185,7 +185,7 @@ const getCricByGroupId = async function (req, res) {
       ball: cricket.ball,
       start: cricket.start,
       currentBallTime: new Date(),
-      nextBallTime: cricket.nextBallTime + 1 * 10 + 100 ,
+      nextBallTime: cricket.nextBallTime + 1 * 7 * 1000 ,
       ballSpeed: cricket.ballSpeed,
     };
     return res.status(200).json(cricket1);
