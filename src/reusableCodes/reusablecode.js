@@ -79,7 +79,14 @@ async function startMatch(grpId, group) {
     console.log("result", result);
     const matchData = await groupModel.findOneAndUpdate(
       { _id: grpId },
-      { updatedPlayers: result, $set: { start: true } },
+      {
+        updatedPlayers: result,
+        $set: {
+          start: true,
+          currentBallTime: Date.now(),
+          nextBallTime: Date.now() + 1 * 7 * 1000,
+        },
+      },
       { new: true, setDefaultsOnInsert: true }
     );
     console.log("this is updated data >>>>>>>>>>", matchData);
@@ -132,12 +139,10 @@ async function updateBalls(grpId) {
         { new: true }
       );
       if (!updateTable) {
-        return result
-          .status(404)
-          .send({
-            status: false,
-            message: "table is not updated for isMatchOverForTable to true ",
-          });
+        return result.status(404).send({
+          status: false,
+          message: "table is not updated for isMatchOverForTable to true ",
+        });
       }
       let players = updateWicket.updatedPlayers.sort((a, b) => {
         if (b.run !== a.run) {
@@ -199,6 +204,10 @@ async function updateBalls(grpId) {
 
       console.log(ballCount, "ballCount================");
       console.log(updateBall.nextBallTime, "nextBallTime================");
+      console.log(
+        updateBall.nextBallTime - updateBall.currentBallTime,
+        "++++++++++++++++++"
+      );
 
       const updateRunForBot = updateBall.updatedPlayers.map((botPlayers) => {
         if (botPlayers.isBot === true) {
@@ -290,7 +299,7 @@ async function updateBalls(grpId) {
     //   const updatedBalance = await userModel.bulkWrite(userBulkUpdates);
     // }
 
-    if (ballCountForWicket <= min - 1 ) {
+    if (ballCountForWicket <= min - 1) {
       console.log("Reached minimum ball count!");
       return true;
     }
