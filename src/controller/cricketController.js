@@ -361,7 +361,6 @@ const updateCric = async function (req, res) {
       );
 
       //___________________send the response when hit the api 1st time
-
       return res.status(200).json(responseForFstHit);
     }
     if (isRunUpdated === true) {
