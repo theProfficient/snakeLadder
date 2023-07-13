@@ -36,7 +36,7 @@ const getAllCric = async function (req, res) {
 // _______________________get cricket group by id data
 
 const getCricByGroupId = async function (req, res) {
-  //try {
+  try {
     let groupId = req.query.groupId;
 
     let cricket = await groupModel.findById({ _id: groupId });
@@ -176,12 +176,12 @@ const getCricByGroupId = async function (req, res) {
       
     }
     return res.status(200).json(cricket);
-  // } catch (err) {
-  //   return res.status(500).send({
-  //     status: false,
-  //     error: err.message,
-  //   });
-  // }
+  } catch (err) {
+    return res.status(500).send({
+      status: false,
+      error: err.message,
+    });
+  }
 };
 
 
@@ -189,7 +189,7 @@ const getCricByGroupId = async function (req, res) {
 //____________________________update table__________________________
 
 const updateCric = async function (req, res) {
-  //try {
+  try {
     let updateData = req.query;
     let UserId = req.query.UserId;
     let groupId = req.query.groupId;
@@ -249,63 +249,62 @@ const updateCric = async function (req, res) {
       let currentRun = 1;
 
       switch (ballSpeed) {
-        case 11:
-        case 12:
-          if (timeDiff >= 20) {
+        case 7:
+        case 8:
+          if (timeDiff >= 17) {
             currentRun = 4;
-          } else if (timeDiff >= 18) {
+          } else if (timeDiff >= 13) {
             currentRun = 2;
-          } else if (timeDiff >= 14) {
+          } else if (timeDiff >= 9) {
             currentRun = 6;
-          } else if (timeDiff >= 10) {
+          } else if (timeDiff >= 5) {
             currentRun = 1;
           } else if (timeDiff >= 1) {
             currentRun = 3;
+          } else {
+            console.log("You just missed the ball");
+          }
+          break;
+        case 9:
+        case 10:
+          if (timeDiff >= 18) {
+            currentRun = 3;
+          } else if (timeDiff >= 14) {
+            currentRun = 1;
+          } else if (timeDiff >= 9) {
+            currentRun = 6;
+          } else if (timeDiff >= 5) {
+            currentRun = 4;
+          } else if (timeDiff >= 1) {
+            currentRun = 2;
+          } else {
+            console.log("You just missed the ball");
+          }
+          break;
+        case 11:
+        case 12:
+          if (timeDiff >= 14) {
+            currentRun = 6;
+          } else if (timeDiff >= 12) {
+            currentRun = 1;
+          } else if (timeDiff >= 8) {
+            currentRun = 3;
+          } else if (timeDiff >= 4) {
+            currentRun = 2;
+          } else if (timeDiff >= 1) {
+            currentRun = 4;
           } else {
             console.log("You just missed the ball");
           }
           break;
         case 13:
-        case 14:
-          if (timeDiff >= 20) {
-            currentRun = 3;
-          } else if (timeDiff >= 18) {
-            currentRun = 1;
-          } else if (timeDiff >= 14) {
+          if (timeDiff >= 14) {
             currentRun = 6;
-          } else if (timeDiff >= 10) {
-            currentRun = 4;
-          } else if (timeDiff >= 1) {
+          } else if (timeDiff >= 12) {
             currentRun = 2;
-          } else {
-            console.log("You just missed the ball");
-          }
-          break;
-        case 15:
-        case 16:
-          if (timeDiff >= 20) {
-            currentRun = 6;
-          } else if (timeDiff >= 18) {
-            currentRun = 1;
-          } else if (timeDiff >= 14) {
+          } else if (timeDiff >= 8) {
             currentRun = 3;
-          } else if (timeDiff >= 10) {
-            currentRun = 2;
-          } else if (timeDiff >= 1) {
-            currentRun = 4;
-          } else {
-            console.log("You just missed the ball");
-          }
-          break;
-        case 17:
-        case 18:
-          if (timeDiff >= 20) {
-            currentRun = 6;
-          } else if (timeDiff >= 18) {
-            currentRun = 2;
-          } else if (timeDiff >= 14) {
-            currentRun = 3;
-          } else if (timeDiff >= 10) {
+          } else if (timeDiff >= 4) {
             currentRun = 4;
           } else if (timeDiff >= 1) {
             currentRun = 1;
@@ -378,10 +377,10 @@ const updateCric = async function (req, res) {
 
       return res.status(200).json(response);
     }
-    // }
-  // } catch (err) {
-  //   return res.status(500).send({status:false,message:err.message})
-  // }
+
+  } catch (err) {
+    return res.status(500).send({status:false,message:err.message})
+  }
 };
 
 //__________________________declare the winner_______________________________(not used in this project)

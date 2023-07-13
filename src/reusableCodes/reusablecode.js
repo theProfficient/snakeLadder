@@ -102,8 +102,8 @@ async function startMatch(grpId, group) {
 
 async function updateBalls(grpId) {
   let min = 0;
-  const minSpeed = 11;
-  const maxSpeed = 18;
+  const minSpeed = 7;
+  const maxSpeed = 13;
   if (grpId != undefined) {
     let updateWicket = await groupModel.findByIdAndUpdate({ _id: grpId });
     let ballCountForWicket = updateWicket.ball;
