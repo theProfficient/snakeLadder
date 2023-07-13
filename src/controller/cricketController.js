@@ -144,22 +144,23 @@ const getCricByGroupId = async function (req, res) {
     
   //   return res.status(200).json(resForWinners);
   // }
-    if(cricket.isMatchOver === true){
-      let resForWinners = {
-            _id: cricket._id,
-            createdTime: cricket.createdTime,
-            tableId: cricket.tableId,
-            updatedPlayers: cricket.updatedPlayers,
-            ball: cricket.ball,
-            start: cricket.start,
-            currentBallTime: new Date(),
-            nextBallTime: cricket.nextBallTime,
-            ballSpeed: cricket.ballSpeed,
-          };
-          
-          return res.status(200).json(resForWinners);
+  if(cricket.isMatchOver === true){
+    let resForWinners = {
+      _id: cricket._id,
+      createdTime: cricket.createdTime,
+      tableId: cricket.tableId,
+      updatedPlayers: cricket.updatedPlayers,
+      ball: cricket.ball,
+      start: cricket.start,
+      currentBallTime: new Date(),
+      nextBallTime: cricket.nextBallTime,
+      ballSpeed: cricket.ballSpeed,
+    };
+    
+    return res.status(200).json(resForWinners);   
+  }
 
-    }
+  if(cricket.nextBallTime - new Date() >= 0){
     if (cricket.updatedPlayers.length !== 0) {
       let cricket1 = {
         _id: cricket._id,
@@ -175,6 +176,23 @@ const getCricByGroupId = async function (req, res) {
       return res.status(200).json(cricket1);
       
     }
+  }else{
+    let cricket1 = {
+      _id: cricket._id,
+      createdTime: cricket.createdTime,
+      tableId: cricket.tableId,
+      updatedPlayers: cricket.updatedPlayers,
+      ball: cricket.ball,
+      start: cricket.start,
+      currentBallTime: new Date(),
+      nextBallTime: cricket.nextBallTime + 1 * 10 + 100 ,
+      ballSpeed: cricket.ballSpeed,
+    };
+    return res.status(200).json(cricket1);
+    
+  }
+
+  
     return res.status(200).json(cricket);
   } catch (err) {
     return res.status(500).send({

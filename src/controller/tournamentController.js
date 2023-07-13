@@ -753,6 +753,26 @@ const getPlayers = async function (req, res) {
   }
 };
 
+//___________________________get all groups as per tableId__________________
+
+
+const allGroupAsPerTableId = async function(req,res){
+  try{
+
+    let tableId = req.query.tableId;
+
+    const getGroups = await groupModel.find({tableId:tableId});
+
+    if(getGroups.length === 0 ){
+      return res.status(404).send({status:false, message:"data not found as per this tableId"})
+    }
+
+    return res.status(200).json(getGroups);
+
+  }catch(error){
+    return res.status(500).send({status:false, message:error.message})
+  }
+}
 module.exports = {
   tournamentsByAdmin,
   createTournaments,
@@ -760,4 +780,5 @@ module.exports = {
   getAllTables,
   getGroups,
   getPlayers,
+  allGroupAsPerTableId
 };                         

@@ -44,6 +44,7 @@ Router.put("/tournament", tournamentController.updateTournament);
 Router.get("/groups", tournamentController.getGroups);
 
 Router.get("/players", tournamentController.getPlayers);
+Router.get("/getAllGroupAsPerTableId", tournamentController.allGroupAsPerTableId);
 
 
 
